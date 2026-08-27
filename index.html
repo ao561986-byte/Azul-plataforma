@@ -1,0 +1,25 @@
+<!doctype html>
+<html lang="es"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>AZUL — Exportación inteligente con IA</title>
+<style>
+body{margin:0;font-family:Inter,Arial,sans-serif;background:#f5f8ff;color:#10234d}header{background:#073a98;color:#fff;padding:18px 28px;display:flex;justify-content:space-between;align-items:center}header b{font-size:28px;letter-spacing:2px}.wrap{max-width:1100px;margin:auto;padding:28px}.hero,.card{background:#fff;border-radius:18px;padding:24px;box-shadow:0 4px 20px #173b7a12;margin-bottom:18px}.hero{background:linear-gradient(110deg,#073a98,#1764e8);color:#fff}.btn{background:#155eef;color:#fff;border:0;border-radius:10px;padding:11px 16px;font-weight:700;cursor:pointer}.white{background:#fff;color:#073a98}.grid{display:grid;grid-template-columns:1fr 1fr;gap:18px}.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}input{width:100%;padding:11px;border:1px solid #dfe5ef;border-radius:9px;margin:6px 0 12px;box-sizing:border-box}table{width:100%;border-collapse:collapse}td,th{padding:11px;border-bottom:1px solid #e7ebf2;text-align:left}.pill{padding:4px 8px;background:#e9fff4;color:#087b4d;border-radius:20px;font-size:12px}@media(max-width:700px){.grid,.row{grid-template-columns:1fr}}
+</style></head><body>
+<header><b>AZUL</b><span>Exportación inteligente con IA</span><span id="user"></span></header>
+<div class="wrap">
+<div id="auth" class="card"><h2>Entrar a AZUL</h2><div class="row"><div><label>Email</label><input id="email" type="email"></div><div><label>Contraseña</label><input id="pass" type="password"></div></div><button class="btn" onclick="login()">Ingresar</button> <button class="btn white" onclick="register()">Crear cuenta</button><p id="authmsg"></p></div>
+<div id="app" style="display:none">
+<div class="hero"><h1>Exportá al mundo con AZUL 🌎</h1><p>Cargá un producto y obtené un análisis inicial de mercados y rentabilidad.</p></div>
+<div class="grid"><div class="card"><h2>Nuevo producto</h2><label>Producto</label><input id="name" placeholder="Ej.: Miel natural"><div class="row"><div><label>Cantidad kg</label><input id="qty" type="number" value="500"></div><div><label>Costo US$/kg</label><input id="cost" type="number" step=".01" value="3.20"></div></div><label>Precio objetivo US$/kg</label><input id="target" type="number" step=".01" value="6.20"><label>Países de interés</label><input id="countries" placeholder="Brasil, Chile..."><button class="btn" onclick="add()">Guardar producto</button><p id="msg"></p></div>
+<div class="card"><h2>Mis productos</h2><div id="products">Cargando...</div></div></div>
+<div class="card"><h2>Resultado del análisis</h2><div id="result">Seleccioná un producto y pulsá “Analizar”.</div></div>
+</div></div>
+<script>
+async function api(url,opt={}){let r=await fetch(url,{headers:{'Content-Type':'application/json'},...opt});let d=await r.json();if(!r.ok)throw Error(d.error||'Error');return d}
+async function boot(){let m=await api('/api/me');if(m.authenticated){document.getElementById('auth').style.display='none';document.getElementById('app').style.display='block';document.getElementById('user').textContent='Hola, '+m.name;load()}}
+async function login(){try{let d=await api('/api/login',{method:'POST',body:JSON.stringify({email:email.value,password:pass.value})});location.reload()}catch(e){authmsg.textContent=e.message}}
+async function register(){let n=prompt('Tu nombre');if(!n)return;try{await api('/api/register',{method:'POST',body:JSON.stringify({name:n,email:email.value,password:pass.value})});location.reload()}catch(e){authmsg.textContent=e.message}}
+async function add(){try{await api('/api/products',{method:'POST',body:JSON.stringify({name:name.value,quantity_kg:qty.value,cost_usd:cost.value,target_usd:target.value,countries:countries.value})});msg.textContent='Producto guardado';load()}catch(e){msg.textContent=e.message}}
+async function load(){let ps=await api('/api/products');products.innerHTML=ps.length?'<table><tr><th>Producto</th><th>Cantidad</th><th>Objetivo</th><th>Acción</th></tr>'+ps.map(p=>`<tr><td>${p.name}</td><td>${p.quantity_kg} kg</td><td>US$ ${p.target_usd}/kg</td><td><button class="btn" onclick="analyze(${p.id})">✨ Analizar</button></td></tr>`).join('')+'</table>':'Todavía no tenés productos.'}
+async function analyze(id){try{let d=await api('/api/analyze/'+id,{method:'POST'});result.innerHTML=`<h3>${d.product}</h3><p>Venta estimada: <b>US$ ${d.revenue_usd}</b> · Costo de producción: <b>US$ ${d.production_usd}</b> · Margen bruto: <span class="pill">${d.gross_margin_pct}%</span></p><h3>Mercados sugeridos</h3><table><tr><th>País</th><th>Puntuación</th><th>Motivo</th></tr>${d.markets.map(x=>`<tr><td>${x.code} ${x.country}</td><td>${x.score}/100</td><td>${x.reason}</td></tr>`).join('')}</table><p><small>${d.disclaimer}</small></p>`}catch(e){result.textContent=e.message}}
+boot()
+</script></body></html>
