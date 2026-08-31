@@ -1,4 +1,5 @@
 
+Escritura
 from flask import Flask, render_template
 
 app = Flask(__name__)
@@ -11,4 +12,17 @@ def inicio():
 
 @app.route("/salud")
 def salud():
-    return 
+    return "Azul Plataforma funcionando correctamente."
+
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=5000)
+Nombre del archivo: Aplicacion.py
+Ubicación: directamente dentro de Azul-plataforma, no dentro de templates.
+La estructura debe quedar:
+Azul-plataforma
+├── Aplicacion.py
+├── requirements.txt
+├── Procfile
+└── templates
+    └── index.html
