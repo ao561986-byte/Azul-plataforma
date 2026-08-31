@@ -22,4 +22,4 @@ async function add(){try{await api('/api/products',{method:'POST',body:JSON.stri
 async function load(){let ps=await api('/api/products');products.innerHTML=ps.length?'<table><tr><th>Producto</th><th>Cantidad</th><th>Objetivo</th><th>Acción</th></tr>'+ps.map(p=>`<tr><td>${p.name}</td><td>${p.quantity_kg} kg</td><td>US$ ${p.target_usd}/kg</td><td><button class="btn" onclick="analyze(${p.id})">✨ Analizar</button></td></tr>`).join('')+'</table>':'Todavía no tenés productos.'}
 async function analyze(id){try{let d=await api('/api/analyze/'+id,{method:'POST'});result.innerHTML=`<h3>${d.product}</h3><p>Venta estimada: <b>US$ ${d.revenue_usd}</b> · Costo de producción: <b>US$ ${d.production_usd}</b> · Margen bruto: <span class="pill">${d.gross_margin_pct}%</span></p><h3>Mercados sugeridos</h3><table><tr><th>País</th><th>Puntuación</th><th>Motivo</th></tr>${d.markets.map(x=>`<tr><td>${x.code} ${x.country}</td><td>${x.score}/100</td><td>${x.reason}</td></tr>`).join('')}</table><p><small>${d.disclaimer}</small></p>`}catch(e){result.textContent=e.message}}
 boot()
-</script></body></html>
+</scr
