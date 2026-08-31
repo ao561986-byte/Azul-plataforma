@@ -19,9 +19,9 @@ if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
 Nombre del archivo: Aplicacion.py
 Ubicación: directamente dentro de Azul-plataforma, no dentro de templates.
-La estructura debe quedar:
-Azul-plataforma
+La estructura Azul-plataforma/
+├── app.py
 ├── requirements.txt
 ├── Procfile
-└── templates
+└── templates/
     └── index.html
