@@ -1,26 +1,14 @@
 
-<main>
+from flask import Flask, render_template
 
-    <div class="card">
-        <h2>Bienvenido</h2>
-        <p>
-            La plataforma está funcionando correctamente.
-        </p>
+app = Flask(__name__)
 
-        <a class="boton" href="/salud">
-            Comprobar sistema
-        </a>
-    </div>
 
-    <div class="card">
-        <h2>Panel</h2>
-        <p>
-            Desde aquí podremos agregar los productos,
-            costos, ventas y análisis de rentabilidad.
-        </p>
-    </div>
+@app.route("/")
+def inicio():
+    return render_template("index.html")
 
-</main>
 
-</body>
-</html
+@app.route("/salud")
+def salud():
+    return 
