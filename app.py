@@ -21,7 +21,6 @@ Nombre del archivo: Aplicacion.py
 Ubicación: directamente dentro de Azul-plataforma, no dentro de templates.
 La estructura debe quedar:
 Azul-plataforma
-├── Aplicacion.py
 ├── requirements.txt
 ├── Procfile
 └── templates
