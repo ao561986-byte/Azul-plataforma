@@ -13,12 +13,12 @@ def inicio():
 def salud():
     return jsonify({
         "success": True,
-        "message": "AZUL funciona correctamente."
+        "message": "Azul Plataforma funcionando correctamente."
     })
 
 
-@app.route("/registro", methods=["POST"])
-def registro():
+@app.route("/register", methods=["POST"])
+def register():
     data = request.get_json(silent=True)
 
     if not data:
@@ -27,19 +27,13 @@ def registro():
             "error": "No se recibieron datos."
         }), 400
 
-    email = str(data.get("email", "")).strip()
-    password = str(data.get("password", "")).strip()
+    email = data.get("email", "").strip()
+    password = data.get("password", "").strip()
 
     if not email or not password:
         return jsonify({
             "success": False,
-            "error": "Completá el email y la contraseña."
-        }), 400
-
-    if len(password) < 6:
-        return jsonify({
-            "success": False,
-            "error": "La contraseña debe tener al menos 6 caracteres."
+            "error": "Email y contraseña son obligatorios."
         }), 400
 
     return jsonify({
@@ -59,18 +53,18 @@ def login():
             "error": "No se recibieron datos."
         }), 400
 
-    email = str(data.get("email", "")).strip()
-    password = str(data.get("password", "")).strip()
+    email = data.get("email", "").strip()
+    password = data.get("password", "").strip()
 
     if not email or not password:
         return jsonify({
             "success": False,
-            "error": "Completá el email y la contraseña."
+            "error": "Email y contraseña son obligatorios."
         }), 400
 
     return jsonify({
         "success": True,
-        "message": "Ingreso correcto.",
+        "message": "Inicio de sesión correcto.",
         "email": email
     })
 
@@ -88,9 +82,12 @@ def products():
     return jsonify({
         "success": True,
         "message": "Producto recibido correctamente.",
-        "data": data
+        "product": data
     })
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", port=10000)
+    import os
+
+    port = int(os.environ.get("PORT", 10000))
+    app.run(host="0.0.0.0", port=port)
