@@ -1,7 +1,9 @@
 import os
 import sqlite3
+
 from flask import Flask, render_template, request, jsonify
 from werkzeug.security import generate_password_hash, check_password_hash
+
 
 app = Flask(__name__)
 
@@ -28,7 +30,7 @@ def init_db():
     conn.execute("""
         CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
-            email TEXT UNIQUE NOT NULL,
+            email TEXT NOT NULL UNIQUE,
             password TEXT NOT NULL
         )
     """)
@@ -38,9 +40,9 @@ def init_db():
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             user_id INTEGER NOT NULL,
             name TEXT NOT NULL,
-            price REAL DEFAULT 0,
-            cost REAL DEFAULT 0,
-            quantity INTEGER DEFAULT 0,
+            price REAL NOT NULL DEFAULT 0,
+            cost REAL NOT NULL DEFAULT 0,
+            quantity INTEGER NOT NULL DEFAULT 0,
             FOREIGN KEY (user_id) REFERENCES users(id)
         )
     """)
@@ -49,11 +51,12 @@ def init_db():
     conn.close()
 
 
+# Crear base de datos al iniciar
 try:
     init_db()
     print("BASE DE DATOS: OK")
 except Exception as e:
-    print("ERROR BASE DE DATOS:", e)
+    print("ERROR BASE DE DATOS:", repr(e))
 
 
 # =========================================================
@@ -69,12 +72,13 @@ def inicio():
 # SALUD DEL SERVIDOR
 # =========================================================
 
-@app.route("/salud")
+@app.route("/salud", methods=["GET"])
 def salud():
+    conn = None
+
     try:
         conn = get_db()
         conn.execute("SELECT 1").fetchone()
-        conn.close()
 
         return jsonify({
             "ok": True,
@@ -82,21 +86,25 @@ def salud():
         })
 
     except Exception as e:
-        print("ERROR SALUD:", e)
+        print("ERROR SALUD:", repr(e))
 
         return jsonify({
             "ok": False,
             "mensaje": "La base de datos no está disponible."
         }), 500
 
+    finally:
+        if conn:
+            conn.close()
+
 
 # =========================================================
-# OBTENER DATOS DEL REGISTRO / LOGIN
+# OBTENER DATOS
 # =========================================================
 
 def obtener_datos():
     """
-    Acepta tanto JSON como formularios tradicionales.
+    Acepta JSON y formularios tradicionales.
     """
 
     datos = request.get_json(silent=True)
@@ -157,7 +165,11 @@ def registro():
         conn = get_db()
 
         usuario_existente = conn.execute(
-            "SELECT id FROM users WHERE email = ?",
+            """
+            SELECT id
+            FROM users
+            WHERE email = ?
+            """,
             (email,)
         ).fetchone()
 
@@ -270,10 +282,8 @@ def login():
         return jsonify({
             "ok": True,
             "mensaje": "Ingreso correcto.",
-            "usuario": {
-                "id": usuario["id"],
-                "email": usuario["email"]
-            }
+            "user_id": usuario["id"],
+            "email": usuario["email"]
         })
 
     except Exception as e:
@@ -307,14 +317,20 @@ def obtener_productos():
         if not user_id:
             return jsonify({
                 "ok": False,
-                "mensaje": "Falta user_id."
+                "mensaje": "Falta el usuario."
             }), 400
 
         conn = get_db()
 
         productos = conn.execute(
             """
-            SELECT id, name, price, cost, quantity
+            SELECT
+                id,
+                user_id,
+                name,
+                price,
+                cost,
+                quantity
             FROM products
             WHERE user_id = ?
             ORDER BY id DESC
@@ -361,25 +377,11 @@ def crear_producto():
                 "mensaje": "No se recibieron datos."
             }), 400
 
-        user_id = datos.get("user_id")
-        name = str(
-            datos.get("name", "")
-        ).strip()
-
         try:
-            price = float(
-                datos.get("price", 0)
-            )
-
-            cost = float(
-                datos.get("cost", 0)
-            )
-
-            quantity = int(
-                datos.get("quantity", 0)
-            )
-
-            user_id = int(user_id)
+            user_id = int(datos.get("user_id"))
+            price = float(datos.get("price", 0))
+            cost = float(datos.get("cost", 0))
+            quantity = int(datos.get("quantity", 0))
 
         except (ValueError, TypeError):
             return jsonify({
@@ -387,18 +389,39 @@ def crear_producto():
                 "mensaje": "Los datos del producto no son válidos."
             }), 400
 
-        if not user_id or not name:
+        name = str(
+            datos.get("name", "")
+        ).strip()
+
+        if not user_id:
             return jsonify({
                 "ok": False,
-                "mensaje": "Faltan datos del producto."
+                "mensaje": "Falta el usuario."
+            }), 400
+
+        if not name:
+            return jsonify({
+                "ok": False,
+                "mensaje": "Ingresá el nombre del producto."
+            }), 400
+
+        if price < 0 or cost < 0 or quantity < 0:
+            return jsonify({
+                "ok": False,
+                "mensaje": "Los valores no pueden ser negativos."
             }), 400
 
         conn = get_db()
 
         cursor = conn.execute(
             """
-            INSERT INTO products
-            (user_id, name, price, cost, quantity)
+            INSERT INTO products (
+                user_id,
+                name,
+                price,
+                cost,
+                quantity
+            )
             VALUES (?, ?, ?, ?, ?)
             """,
             (
@@ -413,6 +436,8 @@ def crear_producto():
         conn.commit()
 
         producto_id = cursor.lastrowid
+
+        print("PRODUCTO CREADO:", producto_id)
 
         return jsonify({
             "ok": True,
@@ -439,7 +464,6 @@ def crear_producto():
 
 @app.errorhandler(404)
 def pagina_no_encontrada(error):
-
     return jsonify({
         "ok": False,
         "mensaje": "Ruta no encontrada."
@@ -448,7 +472,6 @@ def pagina_no_encontrada(error):
 
 @app.errorhandler(405)
 def metodo_no_permitido(error):
-
     return jsonify({
         "ok": False,
         "mensaje": "Método no permitido."
@@ -457,7 +480,6 @@ def metodo_no_permitido(error):
 
 @app.errorhandler(500)
 def error_servidor(error):
-
     return jsonify({
         "ok": False,
         "mensaje": "Error del servidor."
@@ -477,4 +499,4 @@ if __name__ == "__main__":
     app.run(
         host="0.0.0.0",
         port=port
-        )
+    )
