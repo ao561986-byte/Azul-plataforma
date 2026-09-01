@@ -13,7 +13,7 @@
 
         body {
             margin: 0;
-            font-family: Inter, Arial, sans-serif;
+            font-family: Arial, sans-serif;
             background: #f5f8ff;
             color: #172554;
         }
@@ -21,7 +21,7 @@
         header {
             background: linear-gradient(135deg, #0759d8, #1683ff);
             color: white;
-            padding: 20px;
+            padding: 22px;
             text-align: center;
         }
 
@@ -32,12 +32,11 @@
 
         header p {
             margin: 6px 0 0;
-            opacity: 0.9;
         }
 
         .container {
             width: 92%;
-            max-width: 1100px;
+            max-width: 900px;
             margin: 30px auto;
         }
 
@@ -54,21 +53,31 @@
             margin: 45px auto;
         }
 
-        h2 {
-            margin-top: 0;
+        .hero {
+            text-align: center;
+            padding: 20px 10px;
+        }
+
+        .hero h2 {
             color: #0759d8;
+            font-size: 30px;
+            margin-top: 0;
+        }
+
+        .hero p {
+            color: #475569;
+            font-size: 17px;
         }
 
         label {
             display: block;
             margin-top: 14px;
             margin-bottom: 6px;
-            font-weight: 600;
+            font-weight: bold;
         }
 
         input,
-        textarea,
-        select {
+        textarea {
             width: 100%;
             padding: 13px;
             border: 1px solid #cbd5e1;
@@ -103,6 +112,7 @@
         }
 
         .secondary {
+            width: 100%;
             background: #e8f1ff;
             color: #0759d8;
             margin-top: 10px;
@@ -134,20 +144,6 @@
 
         .hidden {
             display: none !important;
-        }
-
-        .hero {
-            text-align: center;
-            padding: 30px 10px;
-        }
-
-        .hero h2 {
-            font-size: 30px;
-        }
-
-        .hero p {
-            font-size: 18px;
-            color: #475569;
         }
 
         .grid {
@@ -207,6 +203,10 @@
 </header>
 
 
+<!-- =========================
+     LOGIN
+========================= -->
+
 <div id="loginScreen" class="container">
 
     <div class="card login-card">
@@ -218,7 +218,10 @@
 
         <form id="loginForm">
 
-            <label for="loginEmail">Email</label>
+            <label for="loginEmail">
+                Email
+            </label>
+
             <input
                 id="loginEmail"
                 type="email"
@@ -226,7 +229,10 @@
                 required
             >
 
-            <label for="loginPassword">Contraseña</label>
+            <label for="loginPassword">
+                Contraseña
+            </label>
+
             <input
                 id="loginPassword"
                 type="password"
@@ -234,7 +240,9 @@
                 required
             >
 
-            <button class="primary" type="submit">
+            <button
+                class="primary"
+                type="submit">
                 Ingresar
             </button>
 
@@ -247,12 +255,19 @@
             Crear cuenta
         </button>
 
-        <div id="loginMessage" class="message"></div>
+        <div
+            id="loginMessage"
+            class="message">
+        </div>
 
     </div>
 
 </div>
 
+
+<!-- =========================
+     REGISTRO
+========================= -->
 
 <div id="registerScreen" class="container hidden">
 
@@ -265,7 +280,10 @@
 
         <form id="registerForm">
 
-            <label for="registerEmail">Email</label>
+            <label for="registerEmail">
+                Email
+            </label>
+
             <input
                 id="registerEmail"
                 type="email"
@@ -273,16 +291,21 @@
                 required
             >
 
-            <label for="registerPassword">Contraseña</label>
+            <label for="registerPassword">
+                Contraseña
+            </label>
+
             <input
                 id="registerPassword"
                 type="password"
-                placeholder="Mínimo 4 caracteres"
+                placeholder="Mínimo 6 caracteres"
+                minlength="6"
                 required
-                minlength="4"
             >
 
-            <button class="primary" type="submit">
+            <button
+                class="primary"
+                type="submit">
                 Crear cuenta
             </button>
 
@@ -295,21 +318,31 @@
             Volver a ingresar
         </button>
 
-        <div id="registerMessage" class="message"></div>
+        <div
+            id="registerMessage"
+            class="message">
+        </div>
 
     </div>
 
 </div>
 
 
+<!-- =========================
+     APLICACIÓN
+========================= -->
+
 <div id="appScreen" class="container hidden">
 
     <div class="card hero">
+
         <h2>Bienvenido a AZUL</h2>
+
         <p>
             Plataforma inteligente para preparar tus productos
             para mercados internacionales.
         </p>
+
     </div>
 
 
@@ -328,58 +361,34 @@
     </div>
 
 
+    <!-- =========================
+         PRODUCTOS
+    ========================= -->
+
     <div class="card">
 
         <h2>Agregar producto</h2>
 
         <form id="productForm">
 
-            <label for="name">
+            <label for="productName">
                 Nombre del producto
             </label>
 
             <input
-                id="name"
+                id="productName"
                 type="text"
                 placeholder="Ej: Miel uruguaya"
                 required
             >
 
 
-            <label for="qty">
-                Cantidad (kg)
+            <label for="productPrice">
+                Precio de venta (USD)
             </label>
 
             <input
-                id="qty"
-                type="number"
-                min="0"
-                step="0.01"
-                placeholder="1000"
-                required
-            >
-
-
-            <label for="cost">
-                Costo total (USD)
-            </label>
-
-            <input
-                id="cost"
-                type="number"
-                min="0"
-                step="0.01"
-                placeholder="2500"
-                required
-            >
-
-
-            <label for="target">
-                Precio objetivo (USD)
-            </label>
-
-            <input
-                id="target"
+                id="productPrice"
                 type="number"
                 min="0"
                 step="0.01"
@@ -388,29 +397,58 @@
             >
 
 
-            <label for="countries">
-                Países objetivo
+            <label for="productCost">
+                Costo (USD)
             </label>
 
-            <textarea
-                id="countries"
-                rows="3"
-                placeholder="Brasil, Chile, España..."
-            ></textarea>
+            <input
+                id="productCost"
+                type="number"
+                min="0"
+                step="0.01"
+                placeholder="2500"
+                required
+            >
 
 
-            <button class="primary" type="submit">
-                Analizar producto
+            <label for="productQuantity">
+                Cantidad
+            </label>
+
+            <input
+                id="productQuantity"
+                type="number"
+                min="0"
+                step="1"
+                placeholder="100"
+                required
+            >
+
+
+            <button
+                class="primary"
+                type="submit">
+                Guardar producto
             </button>
 
         </form>
 
-        <div id="productMessage" class="message"></div>
+        <div
+            id="productMessage"
+            class="message">
+        </div>
 
-        <div id="productResult" class="product-result hidden"></div>
+        <div
+            id="productResult"
+            class="product-result hidden">
+        </div>
 
     </div>
 
+
+    <!-- =========================
+         SESIÓN
+    ========================= -->
 
     <div class="card">
 
@@ -437,331 +475,634 @@
 
 <script>
 
-let currentUser = null;
-let productCount = 0;
+    let currentUser = null;
 
 
-function showMessage(element, text, type) {
+    /* =========================
+       MENSAJES
+    ========================= */
 
-    element.textContent = text;
+    function showMessage(element, text, type) {
 
-    element.className = "message " + type;
-}
+        element.textContent = text;
 
-
-function showScreen(screen) {
-
-    document.getElementById("loginScreen")
-        .classList.add("hidden");
-
-    document.getElementById("registerScreen")
-        .classList.add("hidden");
-
-    document.getElementById("appScreen")
-        .classList.add("hidden");
-
-    document.getElementById(screen)
-        .classList.remove("hidden");
-}
+        element.className = "message " + type;
+    }
 
 
-document
-    .getElementById("showRegister")
-    .addEventListener("click", function () {
+    /* =========================
+       PANTALLAS
+    ========================= */
 
-        showScreen("registerScreen");
+    function showScreen(screen) {
 
-    });
+        document
+            .getElementById("loginScreen")
+            .classList.add("hidden");
+
+        document
+            .getElementById("registerScreen")
+            .classList.add("hidden");
+
+        document
+            .getElementById("appScreen")
+            .classList.add("hidden");
+
+        document
+            .getElementById(screen)
+            .classList.remove("hidden");
+    }
 
 
-document
-    .getElementById("showLogin")
-    .addEventListener("click", function () {
+    /* =========================
+       IR A REGISTRO
+    ========================= */
 
-        showScreen("loginScreen");
+    document
+        .getElementById("showRegister")
+        .addEventListener("click", function () {
 
-    });
+            document
+                .getElementById("registerMessage")
+                .className = "message";
+
+            showScreen("registerScreen");
+
+        });
 
 
-document
-    .getElementById("registerForm")
-    .addEventListener("submit", async function (event) {
+    /* =========================
+       VOLVER AL LOGIN
+    ========================= */
 
-        event.preventDefault();
+    document
+        .getElementById("showLogin")
+        .addEventListener("click", function () {
 
-        const email =
-            document.getElementById("registerEmail").value;
+            document
+                .getElementById("loginMessage")
+                .className = "message";
 
-        const password =
-            document.getElementById("registerPassword").value;
+            showScreen("loginScreen");
 
-        const message =
-            document.getElementById("registerMessage");
+        });
 
-        try {
 
-            const response = await fetch("/register", {
+    /* =========================
+       REGISTRO
+    ========================= */
 
-                method: "POST",
+    document
+        .getElementById("registerForm")
+        .addEventListener("submit", async function (event) {
 
-                headers: {
-                    "Content-Type": "application/json"
-                },
+            event.preventDefault();
 
-                body: JSON.stringify({
-                    email: email,
-                    password: password
-                })
+            const email =
+                document
+                    .getElementById("registerEmail")
+                    .value
+                    .trim()
+                    .toLowerCase();
 
-            });
+            const password =
+                document
+                    .getElementById("registerPassword")
+                    .value;
 
-            const data = await response.json();
+            const message =
+                document
+                    .getElementById("registerMessage");
 
-            if (!response.ok || !data.success) {
+
+            try {
+
+                const response = await fetch(
+                    "/registro",
+                    {
+                        method: "POST",
+
+                        headers: {
+                            "Content-Type":
+                                "application/json"
+                        },
+
+                        body: JSON.stringify({
+                            email: email,
+                            password: password
+                        })
+                    }
+                );
+
+
+                const data =
+                    await response.json();
+
+
+                /*
+                 * IMPORTANTE:
+                 *
+                 * app.py devuelve:
+                 *
+                 * data.ok
+                 * data.mensaje
+                 *
+                 * NO data.success
+                 * NO data.error
+                 */
+
+
+                if (!response.ok || !data.ok) {
+
+                    showMessage(
+                        message,
+                        data.mensaje ||
+                        "No se pudo crear la cuenta.",
+                        "error"
+                    );
+
+                    return;
+                }
+
 
                 showMessage(
                     message,
-                    data.error || "No se pudo crear la cuenta.",
+                    data.mensaje ||
+                    "Cuenta creada correctamente. Ahora podés ingresar.",
+                    "success"
+                );
+
+
+                document
+                    .getElementById("registerForm")
+                    .reset();
+
+
+            } catch (error) {
+
+                console.error(
+                    "ERROR REGISTRO:",
+                    error
+                );
+
+                showMessage(
+                    message,
+                    "Error de conexión con AZUL.",
                     "error"
                 );
 
-                return;
             }
 
-            showMessage(
-                message,
-                "Cuenta creada correctamente. Ahora podés ingresar.",
-                "success"
-            );
+        });
 
-            document.getElementById("registerForm").reset();
 
-        } catch (error) {
+    /* =========================
+       LOGIN
+    ========================= */
 
-            showMessage(
-                message,
-                "Error de conexión con AZUL.",
-                "error"
-            );
+    document
+        .getElementById("loginForm")
+        .addEventListener("submit", async function (event) {
 
+            event.preventDefault();
+
+
+            const email =
+                document
+                    .getElementById("loginEmail")
+                    .value
+                    .trim()
+                    .toLowerCase();
+
+
+            const password =
+                document
+                    .getElementById("loginPassword")
+                    .value;
+
+
+            const message =
+                document
+                    .getElementById("loginMessage");
+
+
+            try {
+
+                const response = await fetch(
+                    "/login",
+                    {
+                        method: "POST",
+
+                        headers: {
+                            "Content-Type":
+                                "application/json"
+                        },
+
+                        body: JSON.stringify({
+                            email: email,
+                            password: password
+                        })
+                    }
+                );
+
+
+                const data =
+                    await response.json();
+
+
+                if (!response.ok || !data.ok) {
+
+                    showMessage(
+                        message,
+                        data.mensaje ||
+                        "No se pudo iniciar sesión.",
+                        "error"
+                    );
+
+                    return;
+                }
+
+
+                currentUser = {
+                    id: data.user_id,
+                    email: data.email
+                };
+
+
+                document
+                    .getElementById("userEmail")
+                    .textContent =
+                    "Usuario: " +
+                    currentUser.email;
+
+
+                document
+                    .getElementById("loginForm")
+                    .reset();
+
+
+                showMessage(
+                    message,
+                    data.mensaje ||
+                    "Ingreso correcto.",
+                    "success"
+                );
+
+
+                showScreen("appScreen");
+
+
+                cargarProductos();
+
+
+            } catch (error) {
+
+                console.error(
+                    "ERROR LOGIN:",
+                    error
+                );
+
+                showMessage(
+                    message,
+                    "Error de conexión con AZUL.",
+                    "error"
+                );
+
+            }
+
+        });
+
+
+    /* =========================
+       CARGAR PRODUCTOS
+    ========================= */
+
+    async function cargarProductos() {
+
+        if (!currentUser) {
+            return;
         }
 
-    });
-
-
-document
-    .getElementById("loginForm")
-    .addEventListener("submit", async function (event) {
-
-        event.preventDefault();
-
-        const email =
-            document.getElementById("loginEmail").value;
-
-        const password =
-            document.getElementById("loginPassword").value;
-
-        const message =
-            document.getElementById("loginMessage");
 
         try {
 
-            const response = await fetch("/login", {
+            const response = await fetch(
+                "/products?user_id=" +
+                encodeURIComponent(
+                    currentUser.id
+                )
+            );
 
-                method: "POST",
 
-                headers: {
-                    "Content-Type": "application/json"
-                },
+            const data =
+                await response.json();
 
-                body: JSON.stringify({
-                    email: email,
-                    password: password
-                })
 
-            });
+            if (!response.ok || !data.ok) {
 
-            const data = await response.json();
-
-            if (!response.ok || !data.success) {
-
-                showMessage(
-                    message,
-                    data.error || "No se pudo iniciar sesión.",
-                    "error"
+                console.error(
+                    "ERROR PRODUCTOS:",
+                    data.mensaje
                 );
 
                 return;
             }
 
-            currentUser = data.user;
 
-            document.getElementById("userEmail")
+            const productos =
+                data.productos || [];
+
+
+            document
+                .getElementById("productCount")
                 .textContent =
-                "Sesión iniciada como: " +
-                currentUser.email;
+                productos.length;
 
-            showScreen("appScreen");
+
+            mostrarProductos(productos);
+
 
         } catch (error) {
 
-            showMessage(
-                message,
-                "Error de conexión con AZUL.",
-                "error"
+            console.error(
+                "ERROR CARGANDO PRODUCTOS:",
+                error
             );
 
         }
 
-    });
+    }
 
 
-document
-    .getElementById("productForm")
-    .addEventListener("submit", async function (event) {
+    /* =========================
+       MOSTRAR PRODUCTOS
+    ========================= */
 
-        event.preventDefault();
-
-        const name =
-            document.getElementById("name").value;
-
-        const quantity =
-            document.getElementById("qty").value;
-
-        const cost =
-            document.getElementById("cost").value;
-
-        const target =
-            document.getElementById("target").value;
-
-        const countries =
-            document.getElementById("countries").value;
-
-        const message =
-            document.getElementById("productMessage");
+    function mostrarProductos(productos) {
 
         const result =
-            document.getElementById("productResult");
+            document.getElementById(
+                "productResult"
+            );
 
-        try {
 
-            const response = await fetch("/products", {
+        if (!productos.length) {
 
-                method: "POST",
+            result.classList.add("hidden");
 
-                headers: {
-                    "Content-Type": "application/json"
-                },
+            result.innerHTML = "";
 
-                body: JSON.stringify({
+            return;
+        }
 
-                    name: name,
 
-                    quantity_kg: quantity,
+        let html =
+            "<strong>Tus productos:</strong><br><br>";
 
-                    cost_usd: cost,
 
-                    target_usd: target,
+        productos.forEach(function (producto) {
 
-                    countries: countries
+            html +=
+                "<div style='margin-bottom:12px;'>" +
 
-                })
+                "<strong>" +
+                escapeHtml(producto.name) +
+                "</strong>" +
 
-            });
+                "<br>Precio: USD " +
+                Number(producto.price).toFixed(2) +
 
-            const data = await response.json();
+                "<br>Costo: USD " +
+                Number(producto.cost).toFixed(2) +
 
-            if (!response.ok || !data.success) {
+                "<br>Cantidad: " +
+                producto.quantity +
+
+                "</div>";
+
+        });
+
+
+        result.innerHTML = html;
+
+        result.classList.remove("hidden");
+
+    }
+
+
+    /* =========================
+       SEGURIDAD HTML
+    ========================= */
+
+    function escapeHtml(text) {
+
+        const div =
+            document.createElement("div");
+
+        div.textContent =
+            text == null ? "" : text;
+
+        return div.innerHTML;
+    }
+
+
+    /* =========================
+       CREAR PRODUCTO
+    ========================= */
+
+    document
+        .getElementById("productForm")
+        .addEventListener("submit", async function (event) {
+
+            event.preventDefault();
+
+
+            if (!currentUser) {
+
+                showScreen("loginScreen");
+
+                return;
+            }
+
+
+            const name =
+                document
+                    .getElementById("productName")
+                    .value
+                    .trim();
+
+
+            const price =
+                Number(
+                    document
+                        .getElementById("productPrice")
+                        .value
+                );
+
+
+            const cost =
+                Number(
+                    document
+                        .getElementById("productCost")
+                        .value
+                );
+
+
+            const quantity =
+                Number(
+                    document
+                        .getElementById("productQuantity")
+                        .value
+                );
+
+
+            const message =
+                document
+                    .getElementById("productMessage");
+
+
+            if (!name) {
 
                 showMessage(
                     message,
-                    data.error || "No se pudo guardar el producto.",
+                    "Ingresá el nombre del producto.",
                     "error"
                 );
 
                 return;
             }
 
-            productCount++;
 
-            document.getElementById("productCount")
-                .textContent = productCount;
+            if (
+                !Number.isFinite(price) ||
+                !Number.isFinite(cost) ||
+                !Number.isInteger(quantity)
+            ) {
 
-            showMessage(
-                message,
-                data.message,
-                "success"
-            );
+                showMessage(
+                    message,
+                    "Revisá los datos del producto.",
+                    "error"
+                );
 
-            const product = data.product;
-
-            result.classList.remove("hidden");
-
-            result.innerHTML = `
-                <h3>Producto analizado</h3>
-
-                <p>
-                    <strong>Producto:</strong>
-                    ${product.name}
-                </p>
-
-                <p>
-                    <strong>Cantidad:</strong>
-                    ${product.quantity_kg} kg
-                </p>
-
-                <p>
-                    <strong>Costo:</strong>
-                    USD ${product.cost_usd.toFixed(2)}
-                </p>
-
-                <p>
-                    <strong>Precio objetivo:</strong>
-                    USD ${product.target_usd.toFixed(2)}
-                </p>
-
-                <p>
-                    <strong>Margen estimado:</strong>
-                    USD ${product.profit_usd.toFixed(2)}
-                </p>
-
-                <p>
-                    <strong>Países:</strong>
-                    ${product.countries || "No especificados"}
-                </p>
-            `;
-
-            document.getElementById("productForm").reset();
-
-        } catch (error) {
-
-            showMessage(
-                message,
-                "Error de conexión con AZUL.",
-                "error"
-            );
-
-        }
-
-    });
+                return;
+            }
 
 
-document
-    .getElementById("logoutButton")
-    .addEventListener("click", function () {
+            try {
 
-        currentUser = null;
+                const response = await fetch(
+                    "/products",
+                    {
+                        method: "POST",
 
-        document.getElementById("loginForm").reset();
+                        headers: {
+                            "Content-Type":
+                                "application/json"
+                        },
 
-        showScreen("loginScreen");
+                        body: JSON.stringify({
 
-    });
+                            user_id:
+                                currentUser.id,
+
+                            name:
+                                name,
+
+                            price:
+                                price,
+
+                            cost:
+                                cost,
+
+                            quantity:
+                                quantity
+                        })
+                    }
+                );
 
 
-showScreen("loginScreen");
+                const data =
+                    await response.json();
 
-</script>
 
-</body>                                                                                                        > 
-</html>         
+                if (!response.ok || !data.ok) {
+
+                    showMessage(
+                        message,
+                        data.mensaje ||
+                        "No se pudo guardar el producto.",
+                        "error"
+                    );
+
+                    return;
+                }
+
+
+                showMessage(
+                    message,
+                    data.mensaje ||
+                    "Producto guardado correctamente.",
+                    "success"
+                );
+
+
+                document
+                    .getElementById("productForm")
+                    .reset();
+
+
+                cargarProductos();
+
+
+            } catch (error) {
+
+                console.error(
+                    "ERROR PRODUCTO:",
+                    error
+                );
+
+                showMessage(
+                    message,
+                    "Error de conexión con AZUL.",
+                    "error"
+                );
+
+            }
+
+        });
+
+
+    /* =========================
+       CERRAR SESIÓN
+    ========================= */
+
+    document
+        .getElementById("logoutButton")
+        .addEventListener("click", function () {
+
+            currentUser = null;
+
+
+            document
+                .getElementById("userEmail")
+                .textContent = "";
+
+
+            document
+                .getElementById("productForm")
+                .reset();
+
+
+            document
+                .getElementById("productMessage")
+                .className = "message";
+
+
+            document
+                .getElementById("productResult")
+                .classList.add("hidden");
+
+
+            document
+                .getElementById("product
