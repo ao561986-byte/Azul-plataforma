@@ -32,16 +32,3 @@ def products():
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
-Ahora hacé esto en GitHub
-Entrá a tu repositorio Azul-plataforma.
-Abrí app.py.
-Tocá el lápiz ✏️ Edit.
-Borrá todo lo que aparece.
-Pegá el código de arriba.
-Tocá Commit changes.
-Esperá que GitHub guarde el cambio.
-Render debería detectar el nuevo commit y comenzar otro deploy automáticamente.
-Después entrá a:
-https://azul-plataforma-real-v3.onrender.com
-y probá nuevamente el inicio de sesión/producto.
-Importante: esta 
