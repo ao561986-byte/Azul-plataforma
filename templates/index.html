@@ -1,402 +1,766 @@
-
 <!doctype html>
 <html lang="es">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>AZUL — Exportación inteligente con IA</title>
+    <title>AZUL — Exportación inteligente con IA</title>
 
-  <style>
-    body {
-      margin: 0;
-      font-family: Inter, Arial, sans-serif;
-      background: #f5f8ff;
-      color: #10234d;
-    }
+    <style>
+        * {
+            box-sizing: border-box;
+        }
 
-    header {
-      background: #073a98;
-      color: #fff;
-      padding: 18px 28px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
+        body {
+            margin: 0;
+            font-family: Inter, Arial, sans-serif;
+            background: #f5f8ff;
+            color: #172554;
+        }
 
-    header b {
-      font-size: 28px;
-      letter-spacing: 2px;
-    }
+        header {
+            background: linear-gradient(135deg, #0759d8, #1683ff);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
 
-    .wrap {
-      max-width: 1100px;
-      margin: auto;
-      padding: 28px;
-    }
+        header h1 {
+            margin: 0;
+            font-size: 32px;
+        }
 
-    .hero,
-    .card {
-      background: #fff;
-      border-radius: 18px;
-      padding: 24px;
-      box-shadow: 0 4px 20px #173b7a12;
-      margin-bottom: 18px;
-    }
+        header p {
+            margin: 6px 0 0;
+            opacity: 0.9;
+        }
 
-    .hero {
-      background: linear-gradient(110deg, #073a98, #1764e8);
-      color: #fff;
-    }
+        .container {
+            width: 92%;
+            max-width: 1100px;
+            margin: 30px auto;
+        }
 
-    .btn {
-      background: #155eef;
-      color: #fff;
-      border: 0;
-      border-radius: 10px;
-      padding: 11px 16px;
-      font-weight: 700;
-      cursor: pointer;
-    }
+        .card {
+            background: white;
+            border-radius: 18px;
+            padding: 25px;
+            margin-bottom: 22px;
+            box-shadow: 0 8px 30px rgba(0, 60, 150, 0.08);
+        }
 
-    .white {
-      background: #fff;
-      color: #073a98;
-    }
+        .login-card {
+            max-width: 430px;
+            margin: 45px auto;
+        }
 
-    .grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 18px;
-    }
+        h2 {
+            margin-top: 0;
+            color: #0759d8;
+        }
 
-    .row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-    }
+        label {
+            display: block;
+            margin-top: 14px;
+            margin-bottom: 6px;
+            font-weight: 600;
+        }
 
-    input {
-      width: 100%;
-      padding: 11px;
-      border: 1px solid #dfe5ef;
-      border-radius: 9px;
-      margin: 6px 0 12px;
-      box-sizing: border-box;
-    }
+        input,
+        textarea,
+        select {
+            width: 100%;
+            padding: 13px;
+            border: 1px solid #cbd5e1;
+            border-radius: 10px;
+            font-size: 16px;
+            outline: none;
+        }
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
-    }
+        input:focus,
+        textarea:focus {
+            border-color: #1683ff;
+        }
 
-    td,
-    th {
-      padding: 11px;
-      border-bottom: 1px solid #e7ebf2;
-      text-align: left;
-    }
+        button {
+            border: 0;
+            border-radius: 10px;
+            padding: 13px 18px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+        }
 
-    .pill {
-      padding: 4px 8px;
-      background: #e9fff4;
-      color: #087b4d;
-      border-radius: 20px;
-      font-size: 12px;
-    }
+        .primary {
+            width: 100%;
+            margin-top: 20px;
+            background: #0759d8;
+            color: white;
+        }
 
-    @media (max-width: 700px) {
-      .grid,
-      .row {
-        grid-template-columns: 1fr;
-      }
+        .primary:hover {
+            background: #0647ad;
+        }
 
-      header {
-        flex-direction: column;
-        gap: 8px;
-        text-align: center;
-      }
-    }
-  </style>
+        .secondary {
+            background: #e8f1ff;
+            color: #0759d8;
+            margin-top: 10px;
+        }
+
+        .danger {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+
+        .message {
+            display: none;
+            padding: 12px;
+            border-radius: 10px;
+            margin-top: 15px;
+        }
+
+        .success {
+            display: block;
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .error {
+            display: block;
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .hero {
+            text-align: center;
+            padding: 30px 10px;
+        }
+
+        .hero h2 {
+            font-size: 30px;
+        }
+
+        .hero p {
+            font-size: 18px;
+            color: #475569;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .stat {
+            background: #eff6ff;
+            border-radius: 14px;
+            padding: 20px;
+        }
+
+        .stat strong {
+            display: block;
+            font-size: 27px;
+            color: #0759d8;
+            margin-top: 5px;
+        }
+
+        .product-result {
+            background: #f8fafc;
+            border-left: 5px solid #1683ff;
+            padding: 18px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 30px;
+            color: #64748b;
+        }
+
+        @media (max-width: 700px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+
+            header h1 {
+                font-size: 27px;
+            }
+
+            .container {
+                width: 95%;
+            }
+        }
+    </style>
 </head>
 
 <body>
 
-  <header>
-    <b>AZUL</b>
-    <span>Exportación inteligente con IA</span>
-    <span id="usuario"></span>
-  </header>
+<header>
+    <h1>AZUL</h1>
+    <p>Exportación inteligente con IA</p>
+</header>
 
-  <div class="wrap">
 
-    <div id="auth" class="card">
-      <h2>Entrar a AZUL</h2>
+<div id="loginScreen" class="container">
 
-      <div class="row">
-        <div>
-          <label>Email</label>
-          <input id="email" type="email">
+    <div class="card login-card">
+
+        <div class="hero">
+            <h2>Entrar a AZUL</h2>
+            <p>Gestioná tus productos para exportación.</p>
         </div>
 
-        <div>
-          <label>Contraseña</label>
-          <input id="pass" type="password">
-        </div>
-      </div>
+        <form id="loginForm">
 
-      <button class="btn" onclick="login()">Ingresar</button>
-      <button class="btn white" onclick="register()">Crear cuenta</button>
+            <label for="loginEmail">Email</label>
+            <input
+                id="loginEmail"
+                type="email"
+                placeholder="tu@email.com"
+                required
+            >
 
-      <p id="authmsg"></p>
+            <label for="loginPassword">Contraseña</label>
+            <input
+                id="loginPassword"
+                type="password"
+                placeholder="Tu contraseña"
+                required
+            >
+
+            <button class="primary" type="submit">
+                Ingresar
+            </button>
+
+        </form>
+
+        <button
+            class="secondary"
+            id="showRegister"
+            type="button">
+            Crear cuenta
+        </button>
+
+        <div id="loginMessage" class="message"></div>
+
     </div>
 
-    <div id="app" style="display:none">
+</div>
 
-      <div class="hero">
-        <h1>Exportá al mundo con AZUL 🌎</h1>
+
+<div id="registerScreen" class="container hidden">
+
+    <div class="card login-card">
+
+        <div class="hero">
+            <h2>Crear cuenta</h2>
+            <p>Comenzá a usar AZUL.</p>
+        </div>
+
+        <form id="registerForm">
+
+            <label for="registerEmail">Email</label>
+            <input
+                id="registerEmail"
+                type="email"
+                placeholder="tu@email.com"
+                required
+            >
+
+            <label for="registerPassword">Contraseña</label>
+            <input
+                id="registerPassword"
+                type="password"
+                placeholder="Mínimo 4 caracteres"
+                required
+                minlength="4"
+            >
+
+            <button class="primary" type="submit">
+                Crear cuenta
+            </button>
+
+        </form>
+
+        <button
+            class="secondary"
+            id="showLogin"
+            type="button">
+            Volver a ingresar
+        </button>
+
+        <div id="registerMessage" class="message"></div>
+
+    </div>
+
+</div>
+
+
+<div id="appScreen" class="container hidden">
+
+    <div class="card hero">
+        <h2>Bienvenido a AZUL</h2>
         <p>
-          Cargá un producto y obtené un análisis inicial
-          de mercados y rentabilidad.
+            Plataforma inteligente para preparar tus productos
+            para mercados internacionales.
         </p>
-      </div>
+    </div>
 
-      <div class="grid">
 
-        <div class="card">
-          <h2>Nuevo producto</h2>
+    <div class="grid">
 
-          <label>Producto</label>
-          <input id="name" placeholder="Ej.: Miel natural">
-
-          <div class="row">
-            <div>
-              <label>Cantidad kg</label>
-              <input id="qty" type="number" value="500">
-            </div>
-
-            <div>
-              <label>Costo US$/kg</label>
-              <input id="cost" type="number" step="0.01" value="3.20">
-            </div>
-          </div>
-
-          <label>Precio objetivo US$/kg</label>
-          <input id="target" type="number" step="0.01" value="6.20">
-
-          <label>Países de interés</label>
-          <input id="countries" placeholder="Brasil, Chile...">
-
-          <button class="btn" onclick="add()">Guardar producto</button>
-
-          <p id="msg"></p>
+        <div class="stat">
+            Productos
+            <strong id="productCount">0</strong>
         </div>
 
-        <div class="card">
-          <h2>Mis productos</h2>
-          <div id="products">Cargando...</div>
+        <div class="stat">
+            Estado
+            <strong>Activo</strong>
         </div>
-
-      </div>
-
-      <div class="card">
-        <h2>Resultado del análisis</h2>
-
-        <div id="result">
-          Seleccioná un producto y pulsá "Analizar".
-        </div>
-      </div>
 
     </div>
 
-  </div>
 
-  <script>
-    async function api(url, opt = {}) {
-      const r = await fetch(url, {
-        headers: {
-          "Content-Type": "application/json"
-        },
-        ...opt
-      });
+    <div class="card">
 
-      const d = await r.json();
+        <h2>Agregar producto</h2>
 
-      if (!r.ok) {
-        throw Error(d.error || "Error");
-      }
+        <form id="productForm">
 
-      return d;
-    }
+            <label for="name">
+                Nombre del producto
+            </label>
 
-    async function boot() {
-      try {
-        const m = await api("/api/me");
+            <input
+                id="name"
+                type="text"
+                placeholder="Ej: Miel uruguaya"
+                required
+            >
 
-        if (m.authenticated) {
-          document.getElementById("auth").style.display = "none";
-          document.getElementById("app").style.display = "block";
-          document.getElementById("usuario").textContent =
-            "Hola, " + m.name;
 
-          load();
+            <label for="qty">
+                Cantidad (kg)
+            </label>
+
+            <input
+                id="qty"
+                type="number"
+                min="0"
+                step="0.01"
+                placeholder="1000"
+                required
+            >
+
+
+            <label for="cost">
+                Costo total (USD)
+            </label>
+
+            <input
+                id="cost"
+                type="number"
+                min="0"
+                step="0.01"
+                placeholder="2500"
+                required
+            >
+
+
+            <label for="target">
+                Precio objetivo (USD)
+            </label>
+
+            <input
+                id="target"
+                type="number"
+                min="0"
+                step="0.01"
+                placeholder="4500"
+                required
+            >
+
+
+            <label for="countries">
+                Países objetivo
+            </label>
+
+            <textarea
+                id="countries"
+                rows="3"
+                placeholder="Brasil, Chile, España..."
+            ></textarea>
+
+
+            <button class="primary" type="submit">
+                Analizar producto
+            </button>
+
+        </form>
+
+        <div id="productMessage" class="message"></div>
+
+        <div id="productResult" class="product-result hidden"></div>
+
+    </div>
+
+
+    <div class="card">
+
+        <h2>Tu sesión</h2>
+
+        <p id="userEmail"></p>
+
+        <button
+            id="logoutButton"
+            class="danger"
+            type="button">
+            Cerrar sesión
+        </button>
+
+    </div>
+
+</div>
+
+
+<footer>
+    AZUL — Exportación inteligente desde Uruguay
+</footer>
+
+
+<script>
+
+let currentUser = null;
+let productCount = 0;
+
+
+function showMessage(element, text, type) {
+
+    element.textContent = text;
+
+    element.className = "message " + type;
+}
+
+
+function showScreen(screen) {
+
+    document.getElementById("loginScreen")
+        .classList.add("hidden");
+
+    document.getElementById("registerScreen")
+        .classList.add("hidden");
+
+    document.getElementById("appScreen")
+        .classList.add("hidden");
+
+    document.getElementById(screen)
+        .classList.remove("hidden");
+}
+
+
+document
+    .getElementById("showRegister")
+    .addEventListener("click", function () {
+
+        showScreen("registerScreen");
+
+    });
+
+
+document
+    .getElementById("showLogin")
+    .addEventListener("click", function () {
+
+        showScreen("loginScreen");
+
+    });
+
+
+document
+    .getElementById("registerForm")
+    .addEventListener("submit", async function (event) {
+
+        event.preventDefault();
+
+        const email =
+            document.getElementById("registerEmail").value;
+
+        const password =
+            document.getElementById("registerPassword").value;
+
+        const message =
+            document.getElementById("registerMessage");
+
+        try {
+
+            const response = await fetch("/register", {
+
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json"
+                },
+
+                body: JSON.stringify({
+                    email: email,
+                    password: password
+                })
+
+            });
+
+            const data = await response.json();
+
+            if (!response.ok || !data.success) {
+
+                showMessage(
+                    message,
+                    data.error || "No se pudo crear la cuenta.",
+                    "error"
+                );
+
+                return;
+            }
+
+            showMessage(
+                message,
+                "Cuenta creada correctamente. Ahora podés ingresar.",
+                "success"
+            );
+
+            document.getElementById("registerForm").reset();
+
+        } catch (error) {
+
+            showMessage(
+                message,
+                "Error de conexión con AZUL.",
+                "error"
+            );
+
         }
-      } catch (e) {
-        console.error(e);
-      }
-    }
 
-    async function login() {
-      try {
-        await api("/api/login", {
-          method: "POST",
-          body: JSON.stringify({
-            email: document.getElementById("email").value,
-            password: document.getElementById("pass").value
-          })
-        });
+    });
 
-        location.reload();
-      } catch (e) {
-        document.getElementById("authmsg").textContent = e.message;
-      }
-    }
 
-    async function register() {
-      const n = prompt("Tu nombre");
+document
+    .getElementById("loginForm")
+    .addEventListener("submit", async function (event) {
 
-      if (!n) return;
+        event.preventDefault();
 
-      try {
-        await api("/api/register", {
-          method: "POST",
-          body: JSON.stringify({
-            name: n,
-            email: document.getElementById("email").value,
-            password: document.getElementById("pass").value
-          })
-        });
+        const email =
+            document.getElementById("loginEmail").value;
 
-        location.reload();
-      } catch (e) {
-        document.getElementById("authmsg").textContent = e.message;
-      }
-    }
+        const password =
+            document.getElementById("loginPassword").value;
 
-    async function add() {
-      try {
-        await api("/api/products", {
-          method: "POST",
-          body: JSON.stringify({
-            name: document.getElementById("name").value,
-            quantity_kg: document.getElementById("qty").value,
-            cost_usd: document.getElementById("cost").value,
-            target_usd: document.getElementById("target").value,
-            countries: document.getElementById("countries").value
-          })
-        });
+        const message =
+            document.getElementById("loginMessage");
 
-        document.getElementById("msg").textContent =
-          "Producto guardado";
+        try {
 
-        load();
-      } catch (e) {
-        document.getElementById("msg").textContent = e.message;
-      }
-    }
+            const response = await fetch("/login", {
 
-    async function load() {
-      try {
-        const ps = await api("/api/products");
+                method: "POST",
 
-        const products = document.getElementById("products");
+                headers: {
+                    "Content-Type": "application/json"
+                },
 
-        if (!ps.length) {
-          products.innerHTML = "Todavía no tenés productos.";
-          return;
+                body: JSON.stringify({
+                    email: email,
+                    password: password
+                })
+
+            });
+
+            const data = await response.json();
+
+            if (!response.ok || !data.success) {
+
+                showMessage(
+                    message,
+                    data.error || "No se pudo iniciar sesión.",
+                    "error"
+                );
+
+                return;
+            }
+
+            currentUser = data.user;
+
+            document.getElementById("userEmail")
+                .textContent =
+                "Sesión iniciada como: " +
+                currentUser.email;
+
+            showScreen("appScreen");
+
+        } catch (error) {
+
+            showMessage(
+                message,
+                "Error de conexión con AZUL.",
+                "error"
+            );
+
         }
 
-        products.innerHTML =
-          "<table>" +
-          "<tr>" +
-          "<th>Producto</th>" +
-          "<th>Cantidad</th>" +
-          "<th>Objetivo</th>" +
-          "<th>Acción</th>" +
-          "</tr>" +
+    });
 
-          ps.map(p =>
-            `<tr>
-              <td>${p.name}</td>
-              <td>${p.quantity_kg} kg</td>
-              <td>US$ ${p.target_usd}/kg</td>
-              <td>
-                <button class="btn"
-                  onclick="analyze(${p.id})">
-                  ✨ Analizar
-                </button>
-              </td>
-            </tr>`
-          ).join("") +
 
-          "</table>";
+document
+    .getElementById("productForm")
+    .addEventListener("submit", async function (event) {
 
-      } catch (e) {
-        document.getElementById("products").textContent = e.message;
-      }
-    }
+        event.preventDefault();
 
-    async function analyze(id) {
-      try {
-        const d = await api("/api/analyze/" + id, {
-          method: "POST"
-        });
+        const name =
+            document.getElementById("name").value;
 
-        document.getElementById("result").innerHTML =
-          `<h3>${d.product}</h3>
+        const quantity =
+            document.getElementById("qty").value;
 
-          <p>
-            Venta estimada:
-            <b>US$ ${d.revenue_usd}</b>
-            ·
-            Costo de producción:
-            <b>US$ ${d.production_usd}</b>
-            ·
-            Margen bruto:
-            <span class="pill">
-              ${d.gross_margin_pct}%
-            </span>
-          </p>
+        const cost =
+            document.getElementById("cost").value;
 
-          <h3>Mercados sugeridos</h3>
+        const target =
+            document.getElementById("target").value;
 
-          <table>
-            <tr>
-              <th>País</th>
-              <th>Puntuación</th>
-              <th>Motivo</th>
-            </tr>
+        const countries =
+            document.getElementById("countries").value;
 
-            ${d.markets.map(x =>
-              `<tr>
-                <td>${x.code} ${x.country}</td>
-                <td>${x.score}/100</td>
-                <td>${x.reason}</td>
-              </tr>`
-            ).join("")}
+        const message =
+            document.getElementById("productMessage");
 
-          </table>
+        const result =
+            document.getElementById("productResult");
 
-          <p>
-            <small>${d.disclaimer}</small>
-          </p>`;
-      } catch (e) {
-        document.getElementById("result").textContent = e.message;
-      }
-    }
+        try {
 
-    boot();
-  </script>
+            const response = await fetch("/products", {
 
-</body>
-</html>
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json"
+                },
+
+                body: JSON.stringify({
+
+                    name: name,
+
+                    quantity_kg: quantity,
+
+                    cost_usd: cost,
+
+                    target_usd: target,
+
+                    countries: countries
+
+                })
+
+            });
+
+            const data = await response.json();
+
+            if (!response.ok || !data.success) {
+
+                showMessage(
+                    message,
+                    data.error || "No se pudo guardar el producto.",
+                    "error"
+                );
+
+                return;
+            }
+
+            productCount++;
+
+            document.getElementById("productCount")
+                .textContent = productCount;
+
+            showMessage(
+                message,
+                data.message,
+                "success"
+            );
+
+            const product = data.product;
+
+            result.classList.remove("hidden");
+
+            result.innerHTML = `
+                <h3>Producto analizado</h3>
+
+                <p>
+                    <strong>Producto:</strong>
+                    ${product.name}
+                </p>
+
+                <p>
+                    <strong>Cantidad:</strong>
+                    ${product.quantity_kg} kg
+                </p>
+
+                <p>
+                    <strong>Costo:</strong>
+                    USD ${product.cost_usd.toFixed(2)}
+                </p>
+
+                <p>
+                    <strong>Precio objetivo:</strong>
+                    USD ${product.target_usd.toFixed(2)}
+                </p>
+
+                <p>
+                    <strong>Margen estimado:</strong>
+                    USD ${product.profit_usd.toFixed(2)}
+                </p>
+
+                <p>
+                    <strong>Países:</strong>
+                    ${product.countries || "No especificados"}
+                </p>
+            `;
+
+            document.getElementById("productForm").reset();
+
+        } catch (error) {
+
+            showMessage(
+                message,
+                "Error de conexión con AZUL.",
+                "error"
+            );
+
+        }
+
+    });
+
+
+document
+    .getElementById("logoutButton")
+    .addEventListener("click", function () {
+
+        currentUser = null;
+
+        document.getElementById("loginForm").reset();
+
+        showScreen("loginScreen");
+
+    });
+
+
+showScreen("loginScreen");
+
+</script>
+
+</body> </html> 
