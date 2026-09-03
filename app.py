@@ -16,64 +16,68 @@ from werkzeug.security import check_password_hash, generate_password_hash
 
 app = Flask(__name__)
 
-# En Render conviene configurar SECRET_KEY como variable de entorno.
+# En Render, configurá SECRET_KEY como variable de entorno.
 app.config["SECRET_KEY"] = os.environ.get(
     "SECRET_KEY",
     "azul-clave-temporal-cambiar-en-render",
 )
 
+# SQLite. Si DATABASE_PATH no existe, usa azul.db en la carpeta del proyecto.
 DATABASE = os.environ.get("DATABASE_PATH", "azul.db")
 
 
 def get_db():
-    """Conecta con la base de datos."""
+    """Abre una conexión a SQLite."""
     conn = sqlite3.connect(DATABASE)
     conn.row_factory = sqlite3.Row
+    conn.execute("PRAGMA foreign_keys = ON")
     return conn
 
 
 def init_db():
-    """Crea las tablas si todavía no existen."""
+    """Crea las tablas necesarias al iniciar AZUL."""
     conn = get_db()
 
-    conn.execute(
-        """
-        CREATE TABLE IF NOT EXISTS users (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            email TEXT NOT NULL UNIQUE,
-            password_hash TEXT NOT NULL,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    try:
+        conn.execute(
+            """
+            CREATE TABLE IF NOT EXISTS users (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                email TEXT NOT NULL UNIQUE,
+                password_hash TEXT NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+            """
         )
-        """
-    )
 
-    conn.execute(
-        """
-        CREATE TABLE IF NOT EXISTS products (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            user_id INTEGER NOT NULL,
-            name TEXT NOT NULL,
-            quantity REAL DEFAULT 0,
-            unit_price REAL DEFAULT 0,
-            currency TEXT DEFAULT 'USD',
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY (user_id) REFERENCES users(id)
+        conn.execute(
+            """
+            CREATE TABLE IF NOT EXISTS products (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                user_id INTEGER NOT NULL,
+                name TEXT NOT NULL,
+                quantity REAL NOT NULL DEFAULT 0,
+                unit_price REAL NOT NULL DEFAULT 0,
+                currency TEXT NOT NULL DEFAULT 'USD',
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY (user_id) REFERENCES users(id)
+                    ON DELETE CASCADE
+            )
+            """
         )
-        """
-    )
 
-    conn.commit()
-    conn.close()
+        conn.commit()
+    finally:
+        conn.close()
 
 
 def login_required(view):
-    """Protege las páginas que requieren sesión."""
+    """Protege las rutas que requieren usuario autenticado."""
 
     @wraps(view)
     def wrapped(*args, **kwargs):
         if "user_id" not in session:
             return redirect(url_for("index"))
-
         return view(*args, **kwargs)
 
     return wrapped
@@ -81,22 +85,22 @@ def login_required(view):
 
 @app.route("/")
 def index():
-    """Página principal."""
+    """Página de inicio, login y registro."""
     if "user_id" in session:
         return redirect(url_for("dashboard"))
 
-    return render_template("index.html")
+    return render_template("index.html", dashboard=False)
 
 
 @app.route("/registro", methods=["POST"])
 def registro():
-    """Registra un usuario nuevo."""
+    """Crea una cuenta nueva."""
     data = request.get_json(silent=True) or request.form
 
     email = str(data.get("email", "")).strip().lower()
     password = str(data.get("password", ""))
 
-    if not email or "@" not in email:
+    if not email or "@" not in email or "." not in email.split("@")[-1]:
         return jsonify(
             {
                 "ok": False,
@@ -112,6 +116,7 @@ def registro():
             }
         ), 400
 
+    password_hash = generate_password_hash(password)
     conn = get_db()
 
     try:
@@ -120,25 +125,18 @@ def registro():
             INSERT INTO users (email, password_hash)
             VALUES (?, ?)
             """,
-            (
-                email,
-                generate_password_hash(password),
-            ),
+            (email, password_hash),
         )
-
         conn.commit()
-
     except sqlite3.IntegrityError:
-        conn.close()
-
         return jsonify(
             {
                 "ok": False,
                 "mensaje": "Ese email ya está registrado.",
             }
         ), 409
-
-    conn.close()
+    finally:
+        conn.close()
 
     return jsonify(
         {
@@ -166,26 +164,21 @@ def login():
 
     conn = get_db()
 
-    user = conn.execute(
-        """
-        SELECT id, email, password_hash
-        FROM users
-        WHERE email = ?
-        """,
-        (email,),
-    ).fetchone()
+    try:
+        user = conn.execute(
+            """
+            SELECT id, email, password_hash
+            FROM users
+            WHERE email = ?
+            """,
+            (email,),
+        ).fetchone()
+    finally:
+        conn.close()
 
-    conn.close()
-
-    if user is None:
-        return jsonify(
-            {
-                "ok": False,
-                "mensaje": "Email o contraseña incorrectos.",
-            }
-        ), 401
-
-    if not check_password_hash(user["password_hash"], password):
+    if user is None or not check_password_hash(
+        user["password_hash"], password
+    ):
         return jsonify(
             {
                 "ok": False,
@@ -194,40 +187,41 @@ def login():
         ), 401
 
     session.clear()
-
     session["user_id"] = user["id"]
     session["email"] = user["email"]
 
     return jsonify(
         {
             "ok": True,
+            "mensaje": "Sesión iniciada correctamente.",
             "redirect": url_for("dashboard"),
         }
     )
 
 
-@app.route("/dashboard")
+@app.route("/dashboard", methods=["GET"])
 @login_required
 def dashboard():
-    """Panel principal del usuario."""
+    """Muestra el panel y solamente los productos del usuario."""
     conn = get_db()
 
-    products = conn.execute(
-        """
-        SELECT
-            id,
-            name,
-            quantity,
-            unit_price,
-            currency
-        FROM products
-        WHERE user_id = ?
-        ORDER BY id DESC
-        """,
-        (session["user_id"],),
-    ).fetchall()
-
-    conn.close()
+    try:
+        products = conn.execute(
+            """
+            SELECT
+                id,
+                name,
+                quantity,
+                unit_price,
+                currency
+            FROM products
+            WHERE user_id = ?
+            ORDER BY id DESC
+            """,
+            (session["user_id"],),
+        ).fetchall()
+    finally:
+        conn.close()
 
     return render_template(
         "index.html",
@@ -240,7 +234,7 @@ def dashboard():
 @app.route("/productos", methods=["POST"])
 @login_required
 def add_product():
-    """Guarda un producto del usuario."""
+    """Guarda un producto perteneciente al usuario conectado."""
     data = request.get_json(silent=True) or request.form
 
     name = str(data.get("name", "")).strip()
@@ -256,7 +250,6 @@ def add_product():
     try:
         quantity = float(data.get("quantity", 0) or 0)
         unit_price = float(data.get("unit_price", 0) or 0)
-
     except (TypeError, ValueError):
         return jsonify(
             {
@@ -265,37 +258,43 @@ def add_product():
             }
         ), 400
 
+    if quantity < 0 or unit_price < 0:
+        return jsonify(
+            {
+                "ok": False,
+                "mensaje": "La cantidad y el precio no pueden ser negativos.",
+            }
+        ), 400
+
     currency = (
-        str(data.get("currency", "USD"))
-        .strip()
-        .upper()[:5]
-        or "USD"
+        str(data.get("currency", "USD")).strip().upper()[:5] or "USD"
     )
 
     conn = get_db()
 
-    conn.execute(
-        """
-        INSERT INTO products (
-            user_id,
-            name,
-            quantity,
-            unit_price,
-            currency
+    try:
+        conn.execute(
+            """
+            INSERT INTO products (
+                user_id,
+                name,
+                quantity,
+                unit_price,
+                currency
+            )
+            VALUES (?, ?, ?, ?, ?)
+            """,
+            (
+                session["user_id"],
+                name,
+                quantity,
+                unit_price,
+                currency,
+            ),
         )
-        VALUES (?, ?, ?, ?, ?)
-        """,
-        (
-            session["user_id"],
-            name,
-            quantity,
-            unit_price,
-            currency,
-        ),
-    )
-
-    conn.commit()
-    conn.close()
+        conn.commit()
+    finally:
+        conn.close()
 
     return jsonify(
         {
@@ -305,27 +304,28 @@ def add_product():
     )
 
 
-@app.route("/logout")
+@app.route("/logout", methods=["GET"])
 def logout():
     """Cierra la sesión."""
     session.clear()
-
     return redirect(url_for("index"))
 
 
-@app.route("/health")
+@app.route("/health", methods=["GET"])
 def health():
-    """Comprobación para Render."""
+    """Comprobación de funcionamiento para Render."""
     return jsonify(
         {
             "ok": True,
             "app": "AZUL",
+            "status": "online",
         }
     )
 
 
 @app.errorhandler(404)
 def not_found(_error):
+    """Respuesta para rutas inexistentes."""
     return jsonify(
         {
             "ok": False,
@@ -336,6 +336,7 @@ def not_found(_error):
 
 @app.errorhandler(500)
 def server_error(_error):
+    """Respuesta para errores internos."""
     return jsonify(
         {
             "ok": False,
@@ -344,15 +345,15 @@ def server_error(_error):
     ), 500
 
 
-# Crear la base de datos al iniciar.
+# Inicializa la base de datos al arrancar.
 init_db()
 
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", "5000"))
-
     app.run(
         host="0.0.0.0",
         port=port,
         debug=False,
-                )
+    )
+
