@@ -4,7 +4,7 @@ from functools import wraps
 
 from flask import (
     Flask,
-    jsonify,
+    flash,
     redirect,
     render_template,
     request,
@@ -13,347 +13,263 @@ from flask import (
 )
 from werkzeug.security import check_password_hash, generate_password_hash
 
-
 app = Flask(__name__)
+app.secret_key = os.environ.get("SECRET_KEY", "azul-clave-secreta")
 
-# En Render, configurá SECRET_KEY como variable de entorno.
-app.config["SECRET_KEY"] = os.environ.get(
-    "SECRET_KEY",
-    "azul-clave-temporal-cambiar-en-render",
-)
-
-# SQLite. Si DATABASE_PATH no existe, usa azul.db en la carpeta del proyecto.
-DATABASE = os.environ.get("DATABASE_PATH", "azul.db")
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+DATABASE = os.path.join(BASE_DIR, "azul.db")
 
 
 def get_db():
-    """Abre una conexión a SQLite."""
-    conn = sqlite3.connect(DATABASE)
-    conn.row_factory = sqlite3.Row
-    conn.execute("PRAGMA foreign_keys = ON")
-    return conn
+    """Abre la base de datos SQLite."""
+    connection = sqlite3.connect(DATABASE)
+    connection.row_factory = sqlite3.Row
+    return connection
 
 
 def init_db():
-    """Crea las tablas necesarias al iniciar AZUL."""
-    conn = get_db()
+    """Crea las tablas necesarias si no existen."""
+    connection = get_db()
 
-    try:
-        conn.execute(
-            """
-            CREATE TABLE IF NOT EXISTS users (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                email TEXT NOT NULL UNIQUE,
-                password_hash TEXT NOT NULL,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            )
-            """
+    connection.execute(
+        """
+        CREATE TABLE IF NOT EXISTS users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            email TEXT UNIQUE NOT NULL,
+            password TEXT NOT NULL
         )
+        """
+    )
 
-        conn.execute(
-            """
-            CREATE TABLE IF NOT EXISTS products (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                user_id INTEGER NOT NULL,
-                name TEXT NOT NULL,
-                quantity REAL NOT NULL DEFAULT 0,
-                unit_price REAL NOT NULL DEFAULT 0,
-                currency TEXT NOT NULL DEFAULT 'USD',
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                FOREIGN KEY (user_id) REFERENCES users(id)
-                    ON DELETE CASCADE
-            )
-            """
+    connection.execute(
+        """
+        CREATE TABLE IF NOT EXISTS products (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            user_id INTEGER NOT NULL,
+            name TEXT NOT NULL,
+            quantity REAL NOT NULL,
+            unit_price REAL NOT NULL,
+            currency TEXT NOT NULL,
+            FOREIGN KEY (user_id) REFERENCES users(id)
         )
+        """
+    )
 
-        conn.commit()
-    finally:
-        conn.close()
+    connection.commit()
+    connection.close()
 
 
-def login_required(view):
-    """Protege las rutas que requieren usuario autenticado."""
-
-    @wraps(view)
-    def wrapped(*args, **kwargs):
+def login_required(function):
+    """Protege las páginas que requieren usuario."""
+    @wraps(function)
+    def decorated_function(*args, **kwargs):
         if "user_id" not in session:
-            return redirect(url_for("index"))
-        return view(*args, **kwargs)
+            return redirect(url_for("login"))
+        return function(*args, **kwargs)
 
-    return wrapped
+    return decorated_function
 
 
 @app.route("/")
 def index():
-    """Página de inicio, login y registro."""
+    """Página principal."""
     if "user_id" in session:
         return redirect(url_for("dashboard"))
 
-    return render_template("index.html", dashboard=False)
+    return render_template("index.html")
 
 
-@app.route("/registro", methods=["POST"])
-def registro():
-    """Crea una cuenta nueva."""
-    data = request.get_json(silent=True) or request.form
+@app.route("/register", methods=["GET", "POST"])
+def register():
+    """Registro de nuevos usuarios."""
+    if request.method == "POST":
+        email = request.form.get("email", "").strip().lower()
+        password = request.form.get("password", "")
 
-    email = str(data.get("email", "")).strip().lower()
-    password = str(data.get("password", ""))
+        if not email or not password:
+            flash("Completá el email y la contraseña.")
+            return render_template("register.html")
 
-    if not email or "@" not in email or "." not in email.split("@")[-1]:
-        return jsonify(
-            {
-                "ok": False,
-                "mensaje": "Ingresá un email válido.",
-            }
-        ), 400
+        if len(password) < 6:
+            flash("La contraseña debe tener al menos 6 caracteres.")
+            return render_template("register.html")
 
-    if len(password) < 6:
-        return jsonify(
-            {
-                "ok": False,
-                "mensaje": "La contraseña debe tener al menos 6 caracteres.",
-            }
-        ), 400
+        connection = get_db()
 
-    password_hash = generate_password_hash(password)
-    conn = get_db()
-
-    try:
-        conn.execute(
-            """
-            INSERT INTO users (email, password_hash)
-            VALUES (?, ?)
-            """,
-            (email, password_hash),
-        )
-        conn.commit()
-    except sqlite3.IntegrityError:
-        return jsonify(
-            {
-                "ok": False,
-                "mensaje": "Ese email ya está registrado.",
-            }
-        ), 409
-    finally:
-        conn.close()
-
-    return jsonify(
-        {
-            "ok": True,
-            "mensaje": "Cuenta creada correctamente. Ahora podés ingresar.",
-        }
-    )
-
-
-@app.route("/login", methods=["POST"])
-def login():
-    """Inicia sesión."""
-    data = request.get_json(silent=True) or request.form
-
-    email = str(data.get("email", "")).strip().lower()
-    password = str(data.get("password", ""))
-
-    if not email or not password:
-        return jsonify(
-            {
-                "ok": False,
-                "mensaje": "Completá email y contraseña.",
-            }
-        ), 400
-
-    conn = get_db()
-
-    try:
-        user = conn.execute(
-            """
-            SELECT id, email, password_hash
-            FROM users
-            WHERE email = ?
-            """,
+        existing_user = connection.execute(
+            "SELECT id FROM users WHERE email = ?",
             (email,),
         ).fetchone()
-    finally:
-        conn.close()
 
-    if user is None or not check_password_hash(
-        user["password_hash"], password
-    ):
-        return jsonify(
-            {
-                "ok": False,
-                "mensaje": "Email o contraseña incorrectos.",
-            }
-        ), 401
+        if existing_user:
+            connection.close()
+            flash("Ese email ya está registrado.")
+            return render_template("register.html")
 
-    session.clear()
-    session["user_id"] = user["id"]
-    session["email"] = user["email"]
+        password_hash = generate_password_hash(password)
 
-    return jsonify(
-        {
-            "ok": True,
-            "mensaje": "Sesión iniciada correctamente.",
-            "redirect": url_for("dashboard"),
-        }
-    )
-
-
-@app.route("/dashboard", methods=["GET"])
-@login_required
-def dashboard():
-    """Muestra el panel y solamente los productos del usuario."""
-    conn = get_db()
-
-    try:
-        products = conn.execute(
-            """
-            SELECT
-                id,
-                name,
-                quantity,
-                unit_price,
-                currency
-            FROM products
-            WHERE user_id = ?
-            ORDER BY id DESC
-            """,
-            (session["user_id"],),
-        ).fetchall()
-    finally:
-        conn.close()
-
-    return render_template(
-        "index.html",
-        dashboard=True,
-        email=session.get("email", ""),
-        products=products,
-    )
-
-
-@app.route("/productos", methods=["POST"])
-@login_required
-def add_product():
-    """Guarda un producto perteneciente al usuario conectado."""
-    data = request.get_json(silent=True) or request.form
-
-    name = str(data.get("name", "")).strip()
-
-    if not name:
-        return jsonify(
-            {
-                "ok": False,
-                "mensaje": "Ingresá el nombre del producto.",
-            }
-        ), 400
-
-    try:
-        quantity = float(data.get("quantity", 0) or 0)
-        unit_price = float(data.get("unit_price", 0) or 0)
-    except (TypeError, ValueError):
-        return jsonify(
-            {
-                "ok": False,
-                "mensaje": "Cantidad o precio inválido.",
-            }
-        ), 400
-
-    if quantity < 0 or unit_price < 0:
-        return jsonify(
-            {
-                "ok": False,
-                "mensaje": "La cantidad y el precio no pueden ser negativos.",
-            }
-        ), 400
-
-    currency = (
-        str(data.get("currency", "USD")).strip().upper()[:5] or "USD"
-    )
-
-    conn = get_db()
-
-    try:
-        conn.execute(
-            """
-            INSERT INTO products (
-                user_id,
-                name,
-                quantity,
-                unit_price,
-                currency
-            )
-            VALUES (?, ?, ?, ?, ?)
-            """,
-            (
-                session["user_id"],
-                name,
-                quantity,
-                unit_price,
-                currency,
-            ),
+        connection.execute(
+            "INSERT INTO users (email, password) VALUES (?, ?)",
+            (email, password_hash),
         )
-        conn.commit()
-    finally:
-        conn.close()
 
-    return jsonify(
-        {
-            "ok": True,
-            "mensaje": "Producto guardado correctamente.",
-        }
-    )
+        connection.commit()
+        connection.close()
+
+        flash("Cuenta creada correctamente. Ahora podés ingresar.")
+        return redirect(url_for("login"))
+
+    return render_template("register.html")
 
 
-@app.route("/logout", methods=["GET"])
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    """Inicio de sesión."""
+    if request.method == "POST":
+        email = request.form.get("email", "").strip().lower()
+        password = request.form.get("password", "")
+
+        connection = get_db()
+
+        user = connection.execute(
+            "SELECT * FROM users WHERE email = ?",
+            (email,),
+        ).fetchone()
+
+        connection.close()
+
+        if user and check_password_hash(user["password"], password):
+            session.clear()
+            session["user_id"] = user["id"]
+            session["email"] = user["email"]
+
+            return redirect(url_for("dashboard"))
+
+        flash("Email o contraseña incorrectos.")
+
+    return render_template("login.html")
+
+
+@app.route("/logout")
 def logout():
     """Cierra la sesión."""
     session.clear()
     return redirect(url_for("index"))
 
 
-@app.route("/health", methods=["GET"])
-def health():
-    """Comprobación de funcionamiento para Render."""
-    return jsonify(
-        {
-            "ok": True,
-            "app": "AZUL",
-            "status": "online",
-        }
+@app.route("/dashboard")
+@login_required
+def dashboard():
+    """Panel principal del usuario."""
+    connection = get_db()
+
+    products = connection.execute(
+        """
+        SELECT id, name, quantity, unit_price, currency
+        FROM products
+        WHERE user_id = ?
+        ORDER BY id DESC
+        """,
+        (session["user_id"],),
+    ).fetchall()
+
+    connection.close()
+
+    return render_template(
+        "dashboard.html",
+        products=products,
+        email=session.get("email"),
     )
 
 
+@app.route("/add_product", methods=["POST"])
+@login_required
+def add_product():
+    """Guarda un nuevo producto."""
+    name = request.form.get("name", "").strip()
+    quantity_text = request.form.get("quantity", "").strip()
+    unit_price_text = request.form.get("unit_price", "").strip()
+    currency = request.form.get("currency", "USD").strip().upper()
+
+    if not name or not quantity_text or not unit_price_text:
+        flash("Completá todos los campos del producto.")
+        return redirect(url_for("dashboard"))
+
+    try:
+        quantity = float(quantity_text.replace(",", "."))
+        unit_price = float(unit_price_text.replace(",", "."))
+    except ValueError:
+        flash("Cantidad o precio inválido.")
+        return redirect(url_for("dashboard"))
+
+    if quantity <= 0 or unit_price <= 0:
+        flash("La cantidad y el precio deben ser mayores que cero.")
+        return redirect(url_for("dashboard"))
+
+    if currency not in ("USD", "UYU", "EUR", "BRL"):
+        currency = "USD"
+
+    connection = get_db()
+
+    connection.execute(
+        """
+        INSERT INTO products
+        (user_id, name, quantity, unit_price, currency)
+        VALUES (?, ?, ?, ?, ?)
+        """,
+        (
+            session["user_id"],
+            name,
+            quantity,
+            unit_price,
+            currency,
+        ),
+    )
+
+    connection.commit()
+    connection.close()
+
+    flash("Producto guardado correctamente.")
+    return redirect(url_for("dashboard"))
+
+
+@app.route("/delete_product/<int:product_id>", methods=["POST"])
+@login_required
+def delete_product(product_id):
+    """Elimina un producto perteneciente al usuario."""
+    connection = get_db()
+
+    connection.execute(
+        """
+        DELETE FROM products
+        WHERE id = ? AND user_id = ?
+        """,
+        (product_id, session["user_id"]),
+    )
+
+    connection.commit()
+    connection.close()
+
+    flash("Producto eliminado.")
+    return redirect(url_for("dashboard"))
+
+
 @app.errorhandler(404)
-def not_found(_error):
-    """Respuesta para rutas inexistentes."""
-    return jsonify(
-        {
-            "ok": False,
-            "mensaje": "Ruta no encontrada.",
-        }
-    ), 404
+def page_not_found(error):
+    """Página no encontrada."""
+    return "Página no encontrada.", 404
 
 
 @app.errorhandler(500)
-def server_error(_error):
-    """Respuesta para errores internos."""
-    return jsonify(
-        {
-            "ok": False,
-            "mensaje": "Error interno del servidor.",
-        }
-    ), 500
+def internal_error(error):
+    """Error interno."""
+    return "Error interno de AZUL.", 500
 
 
-# Inicializa la base de datos al arrancar.
 init_db()
 
 
 if __name__ == "__main__":
-    port = int(os.environ.get("PORT", "5000"))
-    app.run(
-        host="0.0.0.0",
-        port=port,
-        debug=False,
-    )
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
 
