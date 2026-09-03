@@ -1,1108 +1,892 @@
 <!doctype html>
 <html lang="es">
+
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-    <title>AZUL — Exportación inteligente con IA</title>
+  <meta charset="utf-8">
 
-    <style>
-        * {
-            box-sizing: border-box;
-        }
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+  >
 
-        body {
-            margin: 0;
-            font-family: Arial, sans-serif;
-            background: #f5f8ff;
-            color: #172554;
-        }
+  <title>AZUL — Exportación inteligente con IA</title>
 
-        header {
-            background: linear-gradient(135deg, #0759d8, #1683ff);
-            color: white;
-            padding: 22px;
-            text-align: center;
-        }
+  <style>
 
-        header h1 {
-            margin: 0;
-            font-size: 32px;
-        }
+    * {
+      box-sizing: border-box;
+    }
 
-        header p {
-            margin: 6px 0 0;
-        }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Arial, Helvetica, sans-serif;
+      background: linear-gradient(
+        135deg,
+        #eef7ff,
+        #ffffff
+      );
+      color: #12304a;
+    }
 
-        .container {
-            width: 92%;
-            max-width: 900px;
-            margin: 30px auto;
-        }
+    .wrap {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
 
-        .card {
-            background: white;
-            border-radius: 18px;
-            padding: 25px;
-            margin-bottom: 22px;
-            box-shadow: 0 8px 30px rgba(0, 60, 150, 0.08);
-        }
+    .card {
+      width: min(460px, 100%);
+      background: white;
+      border-radius: 22px;
+      padding: 32px;
+      box-shadow:
+        0 18px 55px
+        rgba(12, 63, 102, 0.14);
+    }
 
-        .login-card {
-            max-width: 430px;
-            margin: 45px auto;
-        }
+    .brand {
+      text-align: center;
+      color: #0877c9;
+      font-size: 38px;
+      font-weight: 800;
+      letter-spacing: 2px;
+      margin-bottom: 5px;
+    }
 
-        .hero {
-            text-align: center;
-            padding: 20px 10px;
-        }
+    .tagline {
+      text-align: center;
+      color: #5d7487;
+      margin-bottom: 28px;
+    }
 
-        .hero h2 {
-            color: #0759d8;
-            font-size: 30px;
-            margin-top: 0;
-        }
+    h1 {
+      font-size: 25px;
+      margin: 0 0 8px;
+    }
 
-        .hero p {
-            color: #475569;
-            font-size: 17px;
-        }
+    .sub {
+      color: #687d8d;
+      margin: 0 0 24px;
+    }
 
-        label {
-            display: block;
-            margin-top: 14px;
-            margin-bottom: 6px;
-            font-weight: bold;
-        }
+    label {
+      display: block;
+      font-weight: 700;
+      margin: 14px 0 7px;
+    }
 
-        input,
-        textarea {
-            width: 100%;
-            padding: 13px;
-            border: 1px solid #cbd5e1;
-            border-radius: 10px;
-            font-size: 16px;
-            outline: none;
-        }
+    input,
+    select {
+      width: 100%;
+      padding: 13px 14px;
+      border: 1px solid #cbd9e4;
+      border-radius: 12px;
+      font-size: 16px;
+      outline: none;
+      background: white;
+    }
 
-        input:focus,
-        textarea:focus {
-            border-color: #1683ff;
-        }
+    input:focus,
+    select:focus {
+      border-color: #0877c9;
+    }
 
-        button {
-            border: 0;
-            border-radius: 10px;
-            padding: 13px 18px;
-            font-size: 16px;
-            font-weight: bold;
-            cursor: pointer;
-        }
+    button {
+      width: 100%;
+      margin-top: 18px;
+      padding: 14px;
+      border: 0;
+      border-radius: 12px;
+      background: #0877c9;
+      color: white;
+      font-size: 16px;
+      font-weight: 700;
+      cursor: pointer;
+    }
 
-        .primary {
-            width: 100%;
-            margin-top: 20px;
-            background: #0759d8;
-            color: white;
-        }
+    button:hover {
+      opacity: 0.92;
+    }
 
-        .primary:hover {
-            background: #0647ad;
-        }
+    button.secondary {
+      background: transparent;
+      color: #0877c9;
+      margin-top: 8px;
+    }
 
-        .secondary {
-            width: 100%;
-            background: #e8f1ff;
-            color: #0759d8;
-            margin-top: 10px;
-        }
+    .message {
+      min-height: 22px;
+      margin-top: 14px;
+      text-align: center;
+      font-weight: 600;
+    }
 
-        .danger {
-            background: #fee2e2;
-            color: #b91c1c;
-        }
+    .footer {
+      text-align: center;
+      color: #718697;
+      font-size: 13px;
+      margin-top: 24px;
+    }
 
-        .message {
-            display: none;
-            padding: 12px;
-            border-radius: 10px;
-            margin-top: 15px;
-        }
+    .hidden {
+      display: none;
+    }
 
-        .success {
-            display: block;
-            background: #dcfce7;
-            color: #166534;
-        }
+    .dashboard {
+      width: min(1000px, 100%);
+    }
 
-        .error {
-            display: block;
-            background: #fee2e2;
-            color: #991b1b;
-        }
+    .dash-head {
+      background: #0877c9;
+      color: white;
+      border-radius: 22px;
+      padding: 26px;
+      margin-bottom: 18px;
+    }
 
-        .hidden {
-            display: none !important;
-        }
+    .dash-head .brand {
+      color: white;
+      text-align: left;
+    }
 
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 20px;
-        }
+    .dash-head h1 {
+      margin-top: 10px;
+    }
 
-        .stat {
-            background: #eff6ff;
-            border-radius: 14px;
-            padding: 20px;
-        }
+    .grid {
+      display: grid;
+      grid-template-columns:
+        repeat(auto-fit, minmax(280px, 1fr));
+      gap: 16px;
+    }
 
-        .stat strong {
-            display: block;
-            font-size: 27px;
-            color: #0759d8;
-            margin-top: 5px;
-        }
+    .panel {
+      background: white;
+      border-radius: 18px;
+      padding: 22px;
+      box-shadow:
+        0 10px 35px
+        rgba(12, 63, 102, 0.10);
+    }
 
-        .product-result {
-            background: #f8fafc;
-            border-left: 5px solid #1683ff;
-            padding: 18px;
-            border-radius: 10px;
-            margin-top: 20px;
-        }
+    .panel h2 {
+      margin-top: 0;
+    }
 
-        footer {
-            text-align: center;
-            padding: 30px;
-            color: #64748b;
-        }
+    .product {
+      padding: 12px 0;
+      border-bottom: 1px solid #e7eef3;
+    }
 
-        @media (max-width: 700px) {
-            .grid {
-                grid-template-columns: 1fr;
-            }
+    .product:last-child {
+      border-bottom: 0;
+    }
 
-            header h1 {
-                font-size: 27px;
-            }
+    .logout {
+      display: inline-block;
+      color: white;
+      text-decoration: none;
+      margin-top: 10px;
+      font-weight: 700;
+    }
 
-            .container {
-                width: 95%;
-            }
-        }
-    </style>
+    .success {
+      color: #16833b;
+    }
+
+    .error {
+      color: #c62828;
+    }
+
+  </style>
+
 </head>
+
 
 <body>
 
-<header>
-    <h1>AZUL</h1>
-    <p>Exportación inteligente con IA</p>
-</header>
 
+{% if dashboard %}
 
-<!-- =========================
-     LOGIN
-========================= -->
+  <!-- ========================= -->
+  <!-- PANEL DE AZUL -->
+  <!-- ========================= -->
 
-<div id="loginScreen" class="container">
+  <div class="wrap">
 
-    <div class="card login-card">
+    <main class="dashboard">
 
-        <div class="hero">
-            <h2>Entrar a AZUL</h2>
-            <p>Gestioná tus productos para exportación.</p>
+      <section class="dash-head">
+
+        <div class="brand">
+          AZUL
         </div>
+
+        <h1>
+          Exportación inteligente con IA
+        </h1>
+
+        <p>
+          Sesión iniciada como
+          <strong>{{ email }}</strong>
+        </p>
+
+        <a
+          class="logout"
+          href="{{ url_for('logout') }}"
+        >
+          Cerrar sesión
+        </a>
+
+      </section>
+
+
+      <div class="grid">
+
+
+        <!-- NUEVO PRODUCTO -->
+
+        <section class="panel">
+
+          <h2>
+            Nuevo producto
+          </h2>
+
+          <form id="productForm">
+
+            <label for="name">
+              Producto
+            </label>
+
+            <input
+              id="name"
+              name="name"
+              type="text"
+              placeholder="Ej.: Miel natural"
+              required
+            >
+
+
+            <label for="quantity">
+              Cantidad
+            </label>
+
+            <input
+              id="quantity"
+              name="quantity"
+              type="number"
+              step="0.01"
+              min="0"
+              value="0"
+            >
+
+
+            <label for="unit_price">
+              Precio objetivo
+            </label>
+
+            <input
+              id="unit_price"
+              name="unit_price"
+              type="number"
+              step="0.01"
+              min="0"
+              value="0"
+            >
+
+
+            <label for="currency">
+              Moneda
+            </label>
+
+            <select
+              id="currency"
+              name="currency"
+            >
+
+              <option value="USD">
+                USD
+              </option>
+
+              <option value="EUR">
+                EUR
+              </option>
+
+              <option value="MXN">
+                MXN
+              </option>
+
+              <option value="UYU">
+                UYU
+              </option>
+
+            </select>
+
+
+            <button type="submit">
+              Guardar producto
+            </button>
+
+          </form>
+
+
+          <div
+            id="productMessage"
+            class="message"
+          ></div>
+
+        </section>
+
+
+        <!-- MIS PRODUCTOS -->
+
+        <section class="panel">
+
+          <h2>
+            Mis productos
+          </h2>
+
+
+          {% if products %}
+
+            {% for product in products %}
+
+              <div class="product">
+
+                <strong>
+                  {{ product["name"] }}
+                </strong>
+
+                <br>
+
+                Cantidad:
+                {{ product["quantity"] }}
+
+                <br>
+
+                Precio:
+                {{ product["currency"] }}
+                {{ product["unit_price"] }}
+
+              </div>
+
+            {% endfor %}
+
+          {% else %}
+
+            <p>
+              Todavía no cargaste productos.
+            </p>
+
+          {% endif %}
+
+        </section>
+
+
+      </div>
+
+
+      <p class="footer">
+        AZUL — Exportación inteligente desde Uruguay
+      </p>
+
+    </main>
+
+  </div>
+
+
+{% else %}
+
+
+  <!-- ========================= -->
+  <!-- LOGIN / REGISTRO -->
+  <!-- ========================= -->
+
+  <div class="wrap">
+
+    <main class="card">
+
+      <div class="brand">
+        AZUL
+      </div>
+
+      <div class="tagline">
+        Exportación inteligente con IA
+      </div>
+
+
+      <!-- LOGIN -->
+
+      <section id="loginView">
+
+        <h1>
+          Entrar a AZUL
+        </h1>
+
+        <p class="sub">
+          Gestioná tus productos para exportación.
+        </p>
+
 
         <form id="loginForm">
 
-            <label for="loginEmail">
-                Email
-            </label>
+          <label for="loginEmail">
+            Email
+          </label>
 
-            <input
-                id="loginEmail"
-                type="email"
-                placeholder="tu@email.com"
-                required
-            >
+          <input
+            id="loginEmail"
+            name="email"
+            type="email"
+            autocomplete="email"
+            required
+          >
 
-            <label for="loginPassword">
-                Contraseña
-            </label>
 
-            <input
-                id="loginPassword"
-                type="password"
-                placeholder="Tu contraseña"
-                required
-            >
+          <label for="loginPassword">
+            Contraseña
+          </label>
 
-            <button
-                class="primary"
-                type="submit">
-                Ingresar
-            </button>
+          <input
+            id="loginPassword"
+            name="password"
+            type="password"
+            autocomplete="current-password"
+            required
+          >
+
+
+          <button type="submit">
+            Ingresar
+          </button>
 
         </form>
 
+
         <button
-            class="secondary"
-            id="showRegister"
-            type="button">
-            Crear cuenta
+          class="secondary"
+          id="showRegister"
+          type="button"
+        >
+          Crear cuenta
         </button>
 
+
         <div
-            id="loginMessage"
-            class="message">
-        </div>
+          id="loginMessage"
+          class="message"
+        ></div>
 
-    </div>
-
-</div>
+      </section>
 
 
-<!-- =========================
-     REGISTRO
-========================= -->
+      <!-- REGISTRO -->
 
-<div id="registerScreen" class="container hidden">
+      <section
+        id="registerView"
+        class="hidden"
+      >
 
-    <div class="card login-card">
+        <h1>
+          Crear cuenta
+        </h1>
 
-        <div class="hero">
-            <h2>Crear cuenta</h2>
-            <p>Comenzá a usar AZUL.</p>
-        </div>
+        <p class="sub">
+          Comenzá a usar AZUL.
+        </p>
+
 
         <form id="registerForm">
 
-            <label for="registerEmail">
-                Email
-            </label>
+          <label for="registerEmail">
+            Email
+          </label>
 
-            <input
-                id="registerEmail"
-                type="email"
-                placeholder="tu@email.com"
-                required
-            >
-
-            <label for="registerPassword">
-                Contraseña
-            </label>
-
-            <input
-                id="registerPassword"
-                type="password"
-                placeholder="Mínimo 6 caracteres"
-                minlength="6"
-                required
-            >
-
-            <button
-                class="primary"
-                type="submit">
-                Crear cuenta
-            </button>
-
-        </form>
-
-        <button
-            class="secondary"
-            id="showLogin"
-            type="button">
-            Volver a ingresar
-        </button>
-
-        <div
-            id="registerMessage"
-            class="message">
-        </div>
-
-    </div>
-
-</div>
+          <input
+            id="registerEmail"
+            name="email"
+            type="email"
+            autocomplete="email"
+            required
+          >
 
 
-<!-- =========================
-     APLICACIÓN
-========================= -->
+          <label for="registerPassword">
+            Contraseña
+          </label>
 
-<div id="appScreen" class="container hidden">
-
-    <div class="card hero">
-
-        <h2>Bienvenido a AZUL</h2>
-
-        <p>
-            Plataforma inteligente para preparar tus productos
-            para mercados internacionales.
-        </p>
-
-    </div>
+          <input
+            id="registerPassword"
+            name="password"
+            type="password"
+            minlength="6"
+            autocomplete="new-password"
+            required
+          >
 
 
-    <div class="grid">
-
-        <div class="stat">
-            Productos
-            <strong id="productCount">0</strong>
-        </div>
-
-        <div class="stat">
-            Estado
-            <strong>Activo</strong>
-        </div>
-
-    </div>
-
-
-    <!-- =========================
-         PRODUCTOS
-    ========================= -->
-
-    <div class="card">
-
-        <h2>Agregar producto</h2>
-
-        <form id="productForm">
-
-            <label for="productName">
-                Nombre del producto
-            </label>
-
-            <input
-                id="productName"
-                type="text"
-                placeholder="Ej: Miel uruguaya"
-                required
-            >
-
-
-            <label for="productPrice">
-                Precio de venta (USD)
-            </label>
-
-            <input
-                id="productPrice"
-                type="number"
-                min="0"
-                step="0.01"
-                placeholder="4500"
-                required
-            >
-
-
-            <label for="productCost">
-                Costo (USD)
-            </label>
-
-            <input
-                id="productCost"
-                type="number"
-                min="0"
-                step="0.01"
-                placeholder="2500"
-                required
-            >
-
-
-            <label for="productQuantity">
-                Cantidad
-            </label>
-
-            <input
-                id="productQuantity"
-                type="number"
-                min="0"
-                step="1"
-                placeholder="100"
-                required
-            >
-
-
-            <button
-                class="primary"
-                type="submit">
-                Guardar producto
-            </button>
+          <button type="submit">
+            Crear cuenta
+          </button>
 
         </form>
 
-        <div
-            id="productMessage"
-            class="message">
-        </div>
-
-        <div
-            id="productResult"
-            class="product-result hidden">
-        </div>
-
-    </div>
-
-
-    <!-- =========================
-         SESIÓN
-    ========================= -->
-
-    <div class="card">
-
-        <h2>Tu sesión</h2>
-
-        <p id="userEmail"></p>
 
         <button
-            id="logoutButton"
-            class="danger"
-            type="button">
-            Cerrar sesión
+          class="secondary"
+          id="showLogin"
+          type="button"
+        >
+          Volver a ingresar
         </button>
 
-    </div>
 
-</div>
+        <div
+          id="registerMessage"
+          class="message"
+        ></div>
 
-
-<footer>
-    AZUL — Exportación inteligente desde Uruguay
-</footer>
-
-
-<script>
-
-    let currentUser = null;
+      </section>
 
 
-    /* =========================
-       MENSAJES
-    ========================= */
+      <p class="footer">
+        AZUL — Exportación inteligente desde Uruguay
+      </p>
 
-    function showMessage(element, text, type) {
+    </main>
 
-        element.textContent = text;
+  </div>
 
-        element.className = "message " + type;
+
+  <script>
+
+    async function sendForm(url, form) {
+
+      const data =
+        Object.fromEntries(
+          new FormData(form).entries()
+        );
+
+      const response =
+        await fetch(
+          url,
+          {
+            method: "POST",
+
+            headers: {
+              "Content-Type":
+                "application/json"
+            },
+
+            body:
+              JSON.stringify(data)
+          }
+        );
+
+      return await response.json();
     }
 
 
-    /* =========================
-       PANTALLAS
-    ========================= */
+    const loginView =
+      document.getElementById(
+        "loginView"
+      );
 
-    function showScreen(screen) {
-
-        document
-            .getElementById("loginScreen")
-            .classList.add("hidden");
-
-        document
-            .getElementById("registerScreen")
-            .classList.add("hidden");
-
-        document
-            .getElementById("appScreen")
-            .classList.add("hidden");
-
-        document
-            .getElementById(screen)
-            .classList.remove("hidden");
-    }
+    const registerView =
+      document.getElementById(
+        "registerView"
+      );
 
 
-    /* =========================
-       IR A REGISTRO
-    ========================= */
+    /* MOSTRAR REGISTRO */
 
     document
-        .getElementById("showRegister")
-        .addEventListener("click", function () {
-
-            document
-                .getElementById("registerMessage")
-                .className = "message";
-
-            showScreen("registerScreen");
-
-        });
-
-
-    /* =========================
-       VOLVER AL LOGIN
-    ========================= */
-
-    document
-        .getElementById("showLogin")
-        .addEventListener("click", function () {
-
-            document
-                .getElementById("loginMessage")
-                .className = "message";
-
-            showScreen("loginScreen");
-
-        });
-
-
-    /* =========================
-       REGISTRO
-    ========================= */
-
-    document
-        .getElementById("registerForm")
-        .addEventListener("submit", async function (event) {
-
-            event.preventDefault();
-
-            const email =
-                document
-                    .getElementById("registerEmail")
-                    .value
-                    .trim()
-                    .toLowerCase();
-
-            const password =
-                document
-                    .getElementById("registerPassword")
-                    .value;
-
-            const message =
-                document
-                    .getElementById("registerMessage");
-
-
-            try {
-
-                const response = await fetch(
-                    "/registro",
-                    {
-                        method: "POST",
-
-                        headers: {
-                            "Content-Type":
-                                "application/json"
-                        },
-
-                        body: JSON.stringify({
-                            email: email,
-                            password: password
-                        })
-                    }
-                );
-
-
-                const data =
-                    await response.json();
-
-
-                /*
-                 * IMPORTANTE:
-                 *
-                 * app.py devuelve:
-                 *
-                 * data.ok
-                 * data.mensaje
-                 *
-                 * NO data.success
-                 * NO data.error
-                 */
-
-
-                if (!response.ok || !data.ok) {
-
-                    showMessage(
-                        message,
-                        data.mensaje ||
-                        "No se pudo crear la cuenta.",
-                        "error"
-                    );
-
-                    return;
-                }
-
-
-                showMessage(
-                    message,
-                    data.mensaje ||
-                    "Cuenta creada correctamente. Ahora podés ingresar.",
-                    "success"
-                );
-
-
-                document
-                    .getElementById("registerForm")
-                    .reset();
-
-
-            } catch (error) {
-
-                console.error(
-                    "ERROR REGISTRO:",
-                    error
-                );
-
-                showMessage(
-                    message,
-                    "Error de conexión con AZUL.",
-                    "error"
-                );
-
-            }
-
-        });
-
-
-    /* =========================
-       LOGIN
-    ========================= */
-
-    document
-        .getElementById("loginForm")
-        .addEventListener("submit", async function (event) {
-
-            event.preventDefault();
-
-
-            const email =
-                document
-                    .getElementById("loginEmail")
-                    .value
-                    .trim()
-                    .toLowerCase();
-
-
-            const password =
-                document
-                    .getElementById("loginPassword")
-                    .value;
-
-
-            const message =
-                document
-                    .getElementById("loginMessage");
-
-
-            try {
-
-                const response = await fetch(
-                    "/login",
-                    {
-                        method: "POST",
-
-                        headers: {
-                            "Content-Type":
-                                "application/json"
-                        },
-
-                        body: JSON.stringify({
-                            email: email,
-                            password: password
-                        })
-                    }
-                );
-
-
-                const data =
-                    await response.json();
-
-
-                if (!response.ok || !data.ok) {
-
-                    showMessage(
-                        message,
-                        data.mensaje ||
-                        "No se pudo iniciar sesión.",
-                        "error"
-                    );
-
-                    return;
-                }
-
-
-                currentUser = {
-                    id: data.user_id,
-                    email: data.email
-                };
-
-
-                document
-                    .getElementById("userEmail")
-                    .textContent =
-                    "Usuario: " +
-                    currentUser.email;
-
-
-                document
-                    .getElementById("loginForm")
-                    .reset();
-
-
-                showMessage(
-                    message,
-                    data.mensaje ||
-                    "Ingreso correcto.",
-                    "success"
-                );
-
-
-                showScreen("appScreen");
-
-
-                cargarProductos();
-
-
-            } catch (error) {
-
-                console.error(
-                    "ERROR LOGIN:",
-                    error
-                );
-
-                showMessage(
-                    message,
-                    "Error de conexión con AZUL.",
-                    "error"
-                );
-
-            }
-
-        });
-
-
-    /* =========================
-       CARGAR PRODUCTOS
-    ========================= */
-
-    async function cargarProductos() {
-
-        if (!currentUser) {
-            return;
-        }
-
-
-        try {
-
-            const response = await fetch(
-                "/products?user_id=" +
-                encodeURIComponent(
-                    currentUser.id
-                )
-            );
-
-
-            const data =
-                await response.json();
-
-
-            if (!response.ok || !data.ok) {
-
-                console.error(
-                    "ERROR PRODUCTOS:",
-                    data.mensaje
-                );
-
-                return;
-            }
-
-
-            const productos =
-                data.productos || [];
-
-
-            document
-                .getElementById("productCount")
-                .textContent =
-                productos.length;
-
-
-            mostrarProductos(productos);
-
-
-        } catch (error) {
-
-            console.error(
-                "ERROR CARGANDO PRODUCTOS:",
-                error
-            );
+      .getElementById("showRegister")
+      .addEventListener(
+        "click",
+        () => {
+
+          loginView.classList.add(
+            "hidden"
+          );
+
+          registerView.classList.remove(
+            "hidden"
+          );
 
         }
+      );
 
-    }
+
+    /* VOLVER AL LOGIN */
+
+    document
+      .getElementById("showLogin")
+      .addEventListener(
+        "click",
+        () => {
+
+          registerView.classList.add(
+            "hidden"
+          );
+
+          loginView.classList.remove(
+            "hidden"
+          );
+
+        }
+      );
 
 
-    /* =========================
-       MOSTRAR PRODUCTOS
-    ========================= */
+    /* LOGIN */
 
-    function mostrarProductos(productos) {
+    document
+      .getElementById("loginForm")
+      .addEventListener(
+        "submit",
+        async (event) => {
 
-        const result =
+          event.preventDefault();
+
+          const message =
             document.getElementById(
-                "productResult"
+              "loginMessage"
             );
 
+          message.className =
+            "message";
 
-        if (!productos.length) {
-
-            result.classList.add("hidden");
-
-            result.innerHTML = "";
-
-            return;
-        }
+          message.textContent =
+            "Ingresando...";
 
 
-        let html =
-            "<strong>Tus productos:</strong><br><br>";
+          try {
 
-
-        productos.forEach(function (producto) {
-
-            html +=
-                "<div style='margin-bottom:12px;'>" +
-
-                "<strong>" +
-                escapeHtml(producto.name) +
-                "</strong>" +
-
-                "<br>Precio: USD " +
-                Number(producto.price).toFixed(2) +
-
-                "<br>Costo: USD " +
-                Number(producto.cost).toFixed(2) +
-
-                "<br>Cantidad: " +
-                producto.quantity +
-
-                "</div>";
-
-        });
-
-
-        result.innerHTML = html;
-
-        result.classList.remove("hidden");
-
-    }
-
-
-    /* =========================
-       SEGURIDAD HTML
-    ========================= */
-
-    function escapeHtml(text) {
-
-        const div =
-            document.createElement("div");
-
-        div.textContent =
-            text == null ? "" : text;
-
-        return div.innerHTML;
-    }
-
-
-    /* =========================
-       CREAR PRODUCTO
-    ========================= */
-
-    document
-        .getElementById("productForm")
-        .addEventListener("submit", async function (event) {
-
-            event.preventDefault();
-
-
-            if (!currentUser) {
-
-                showScreen("loginScreen");
-
-                return;
-            }
-
-
-            const name =
-                document
-                    .getElementById("productName")
-                    .value
-                    .trim();
-
-
-            const price =
-                Number(
-                    document
-                        .getElementById("productPrice")
-                        .value
-                );
-
-
-            const cost =
-                Number(
-                    document
-                        .getElementById("productCost")
-                        .value
-                );
-
-
-            const quantity =
-                Number(
-                    document
-                        .getElementById("productQuantity")
-                        .value
-                );
-
-
-            const message =
-                document
-                    .getElementById("productMessage");
-
-
-            if (!name) {
-
-                showMessage(
-                    message,
-                    "Ingresá el nombre del producto.",
-                    "error"
-                );
-
-                return;
-            }
+            const result =
+              await sendForm(
+                "/login",
+                event.target
+              );
 
 
             if (
-                !Number.isFinite(price) ||
-                !Number.isFinite(cost) ||
-                !Number.isInteger(quantity)
+              result.ok &&
+              result.redirect
             ) {
 
-                showMessage(
-                    message,
-                    "Revisá los datos del producto.",
-                    "error"
-                );
+              window.location.href =
+                result.redirect;
 
-                return;
+              return;
             }
 
 
-            try {
+            message.className =
+              "message error";
 
-                const response = await fetch(
-                    "/products",
-                    {
-                        method: "POST",
+            message.textContent =
+              result.mensaje ||
+              "No se pudo iniciar sesión.";
 
-                        headers: {
-                            "Content-Type":
-                                "application/json"
-                        },
+          } catch (error) {
 
-                        body: JSON.stringify({
+            message.className =
+              "message error";
 
-                            user_id:
-                                currentUser.id,
+            message.textContent =
+              "Error de conexión con AZUL.";
 
-                            name:
-                                name,
+          }
 
-                            price:
-                                price,
-
-                            cost:
-                                cost,
-
-                            quantity:
-                                quantity
-                        })
-                    }
-                );
+        }
+      );
 
 
-                const data =
-                    await response.json();
-
-
-                if (!response.ok || !data.ok) {
-
-                    showMessage(
-                        message,
-                        data.mensaje ||
-                        "No se pudo guardar el producto.",
-                        "error"
-                    );
-
-                    return;
-                }
-
-
-                showMessage(
-                    message,
-                    data.mensaje ||
-                    "Producto guardado correctamente.",
-                    "success"
-                );
-
-
-                document
-                    .getElementById("productForm")
-                    .reset();
-
-
-                cargarProductos();
-
-
-            } catch (error) {
-
-                console.error(
-                    "ERROR PRODUCTO:",
-                    error
-                );
-
-                showMessage(
-                    message,
-                    "Error de conexión con AZUL.",
-                    "error"
-                );
-
-            }
-
-        });
-
-
-    /* =========================
-       CERRAR SESIÓN
-    ========================= */
+    /* REGISTRO */
 
     document
-        .getElementById("logoutButton")
-        .addEventListener("click", function () {
+      .getElementById("registerForm")
+      .addEventListener(
+        "submit",
+        async (event) => {
 
-            currentUser = null;
+          event.preventDefault();
 
+          const message =
+            document.getElementById(
+              "registerMessage"
+            );
 
-            document
-                .getElementById("userEmail")
-                .textContent = "";
+          message.className =
+            "message";
 
-
-            document
-                .getElementById("productForm")
-                .reset();
-
-
-            document
-                .getElementById("productMessage")
-                .className = "message";
+          message.textContent =
+            "Creando cuenta...";
 
 
-            document
-                .getElementById("productResult")
-                .classList.add("hidden");
+          try {
+
+            const result =
+              await sendForm(
+                "/registro",
+                event.target
+              );
 
 
-            document
-                .getElementById("product
+            if (result.ok) {
+
+              message.className =
+                "message success";
+
+              message.textContent =
+                result.mensaje;
+
+
+              const email =
+                document.getElementById(
+                  "registerEmail"
+                ).value;
+
+
+              event.target.reset();
+
+
+              setTimeout(
+                () => {
+
+                  registerView
+                    .classList
+                    .add("hidden");
+
+                  loginView
+                    .classList
+                    .remove("hidden");
+
+
+                  document.getElementById(
+                    "loginEmail"
+                  ).value = email;
+
+                },
+                1000
+              );
+
+
+              return;
+            }
+
+
+            message.className =
+              "message error";
+
+            message.textContent =
+              result.mensaje ||
+              "No se pudo crear la cuenta.";
+
+          } catch (error) {
+
+            message.className =
+              "message error";
+
+            message.textContent =
+              "Error de conexión con AZUL.";
+
+          }
+
+        }
+      );
+
+
+    /* GUARDAR PRODUCTO */
+
+    const productForm =
+      document.getElementById(
+        "productForm"
+      );
+
+
+    if (productForm) {
+
+      productForm.addEventListener(
+        "submit",
+        async (event) => {
+
+          event.preventDefault();
+
+          const message =
+            document.getElementById(
+              "productMessage"
+            );
+
+          message.className =
+            "message";
+
+          message.textContent =
+            "Guardando...";
+
+
+          try {
+
+            const result =
+              await sendForm(
+                "/productos",
+                event.target
+              );
+
+
+            if (result.ok) {
+
+              message.className =
+                "message success";
+
+              message.textContent =
+                result.mensaje;
+
+
+              setTimeout(
+                () => {
+                  window.location.reload();
+                },
+                700
+              );
+
+              return;
+            }
+
+
+            message.className =
+              "message error";
+
+            message.textContent =
+              result.mensaje ||
+              "No se pudo guardar.";
+
+          } catch (error) {
+
+            message.className =
+              "message error";
+
+            message.textContent =
+              "Error de conexión con AZUL.";
+
+          }
+
+        }
+      );
+
+    }
+
+  </script>
+
+
+{% endif %}
+
+
+</body>
+
+</html>
+        
